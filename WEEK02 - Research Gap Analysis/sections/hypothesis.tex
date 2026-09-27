@@ -1,0 +1,73 @@
+\section{Giả thuyết và thiết lập}
+\label{sec:hypothesis}
+
+\subsection{Claim có thể bác bỏ (RQ1)}
+
+Chúng tôi phát biểu claim chính để sau đo lường có thể ủng hộ hoặc bác bỏ:
+
+\begin{examplebox}{H1: claim RQ1 có thể bác bỏ}
+      Cùng một cách huấn luyện và đánh giá: nếu chuỗi có \textbf{mùa rõ} hoặc \textbf{xu hướng rõ}
+      (chỉ số \(F_S\), \(F_T\) từ STL cao \cite{cleveland1990stl,hyndman2021fpp3}), thì
+      \[
+            \mathrm{MSE}(\mathrm{DLinear}) < \mathrm{MSE}(\mathrm{NLinear})
+      \]
+      (tức DLinear dự báo tốt hơn NLinear).
+
+      Ngược lại, nếu chuỗi \textbf{hay đổi mức} hoặc \textbf{không dừng mạnh}
+      (ví dụ Exchange-Rate, đoạn VIC biến động cao), thì NLinear tốt hơn, hoặc hai model gần nhau
+      (\(\lvert\Delta\rvert\) nhỏ).
+\end{examplebox}
+
+Định nghĩa vận hành (WEEK02 đến WEEK03):
+
+\begin{align*}
+      F_T & = \max\!\bigl(0,\, 1 - \mathrm{Var}(R)/\mathrm{Var}(T+R)\bigr), \\
+      F_S & = \max\!\bigl(0,\, 1 - \mathrm{Var}(R)/\mathrm{Var}(S+R)\bigr),
+\end{align*}
+với \(T,S,R\) lần lượt là xu hướng, mùa và phần dư từ STL. Các proxy không dừng tùy chọn
+(\(p\)-value ADF và/hoặc tỷ số mean/std giữa train và test) sẽ được ghi lại khi đủ thời gian làm.
+Khoảng cách có dấu là
+\(\Delta = \mathrm{MSE}(\mathrm{DLinear}) - \mathrm{MSE}(\mathrm{NLinear})\)
+(âm nghĩa DLinear thắng).
+
+\textbf{Quy tắc bác bỏ.}
+Nếu các dataset \(F_S\)/\(F_T\) cao \emph{không} cho \(\Delta\) âm một cách có hệ thống,
+hoặc các chuỗi dịch mạnh \emph{không} ưu tiên NLinear / khoảng hẹp, ta đánh dấu H1
+bị bác bỏ hoặc chưa kết luận, và vẫn công bố pattern đo được.
+
+\subsection{Kỳ vọng phụ (RQ2)}
+
+Ngoài H1, nhóm cũng xem \(L\) (độ dài lookback) ảnh hưởng thế nào tới hai model.
+Kỳ vọng: trên chuỗi \textbf{mùa rõ} (\(F_S\) cao), khi tăng \(L\) thì MSE của DLinear và NLinear
+lệch nhau rõ hơn, vì DLinear có thể dùng cửa sổ dài để bắt pattern mùa.
+Trên chuỗi giá cổ phiếu gần như đi ngẫu nhiên, hai đường MSE theo \(L\) có thể sát nhau hơn.
+
+RQ2 chỉ mang tính khám phá: nhóm sẽ vẽ và mô tả từng dataset, không đặt một claim đúng/sai
+cứng như H1.
+
+
+\subsection{Phác thảo protocol (WEEK02 đến WEEK04)}
+
+\begin{description}[style=nextline,leftmargin=2.2em]
+      \item[Mô hình.]
+            Cài đặt PyTorch từ đầu cho Linear, NLinear và DLinear;
+            channel-independent, trọng số dùng chung giữa các kênh
+            \cite{zeng2023ltsf}.
+      \item[Metric.]
+            MSE và MAE. Với VIC, có thể đánh giá thêm trên returns nếu protocol WEEK03 quy định.
+      \item[Lookback / horizon.]
+            Mặc định LTSF: \(L,T \in \{96,192,336,720\}\) (có thể cắt bớt và ghi rõ nếu thiếu tài nguyên).
+            VIC: \(L \in \{5,30,120,480\}\), độ dài dự báo \(5\).
+      \item[WEEK02.]
+            Smoke-test mô hình; tính profile STL (ra CSV đặc trưng dữ liệu cho mọi dataset, gồm VIC).
+      \item[WEEK03.]
+            Bảng train/eval đa dataset theo protocol viết sẵn (split, scaling, seed).
+      \item[WEEK04.]
+            Ablation kích thước kernel MA của DLinear; đường cong lookback (RQ2);
+            ghép kết quả với profile STL cho scatter/heatmap RQ1;
+            viết guideline một đoạn và đánh dấu H1 được ủng hộ / bác bỏ / chưa kết luận.
+\end{description}
+
+\noindent\textit{Ghi chú chỉnh sửa sau.}
+Các mục Methods chi tiết, Results, Guideline và Limitations sẽ được bổ sung vào cùng tài liệu
+này khi có thực nghiệm; WEEK02 chủ đích dừng ở khung research-gap ở trên.

@@ -1,0 +1,32 @@
+\section{Dẫn nhập}
+\label{sec:introduction}
+
+Dự báo chuỗi thời gian dài hạn (LTSF) từng bị thống trị bởi các kiến trúc kiểu Transformer.
+Zeng và cộng sự đã thách thức xu hướng đó bằng \textbf{LTSF-Linear}: họ đề xuất họ baseline
+tuyến tính mạnh gồm \textbf{Linear}, \textbf{NLinear} và \textbf{DLinear}, thường ngang
+hoặc vượt Transformer trên nhiều benchmark LTSF trong khi vẫn đơn giản và tối ưu chi phí hơn khi huấn luyện
+\cite{zeng2023ltsf}.
+
+Ba mô hình dùng cùng kiểu ánh xạ tuyến tính độc lập theo kênh từ độ dài lookback \(L\) sang
+horizon \(T\), nhưng khác nhau ở cách xử lý tính không dừng và cấu trúc chuỗi:
+
+\begin{itemize}
+      \item \textbf{Linear:} hồi quy trực tiếp từ cửa sổ \(L\) sang \(T\).
+      \item \textbf{NLinear (chuẩn hóa):} trừ giá trị lookback cuối, dự báo phần dư, rồi cộng lại:
+            đây là cách tái cân bằng (recentering) để chống level shift.
+      \item \textbf{DLinear (phân rã):} tách cửa sổ thành thành phần xu hướng (trend) và thành phần mang
+            tính mùa vụ (seasonal) bằng nhân trung bình trượt, dự báo mỗi nhánh bằng một đầu Linear riêng rồi
+            cộng lại, kế thừa ý tưởng phân rã xu hướng-mùa trong dự báo cổ điển
+            \cite{cleveland1990stl,wu2021autoformer,zhou2022fedformer}.
+\end{itemize}
+
+Chuẩn hóa và phân rã nhằm các chế độ khác nhau. Chuẩn hóa theo instance (ví dụ RevIN)
+hướng tới dịch phân phối giữa train và test \cite{kim2022revin}. Phân rã nhắm cấu trúc xu hướng
+và mùa vụ rõ ràng. Trên benchmark "sạch", Toner và Darlow cho thấy DLinear thường gần như
+cùng lớp mô hình với Linear thuần \cite{toner2024linear}, nhưng điều đó vẫn \emph{không} trả lời
+một người thực hành: \emph{khi nào} nên chọn DLinear thay vì NLinear.
+
+Do đó, dự án tập trung vào một câu hỏi so sánh duy nhất:
+\textbf{Khi nào Decomposition vượt qua Normalization?}
+Chúng ta xem DLinear và NLinear như hai inductive bias, và hỏi đặc trưng dữ liệu nào dự đoán
+mô hình nào thắng, thay vì chỉ báo mô hình nào có MSE thấp hơn trên từng ô bảng xếp hạng.

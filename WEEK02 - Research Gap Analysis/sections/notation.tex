@@ -1,0 +1,94 @@
+\section{Thuật ngữ và ký hiệu}
+\label{sec:notation}
+
+Trước hết, chúng ta có thể đọc qua một số thuật ngữ và ký hiệu sẽ được dùng trong bài viết.
+
+\subsection{Bảng thuật ngữ}
+
+\begin{center}
+  \small
+  \begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.28\textwidth}
+    >{\raggedright\arraybackslash}p{0.62\textwidth}@{}}
+    \toprule
+    \textbf{Thuật ngữ} & \textbf{Ý nghĩa}                                                                                        \\
+    \midrule
+    LTSF
+                       & Long-term Time Series Forecasting: dự báo chuỗi thời gian với horizon dài.                              \\
+    \addlinespace
+    Linear / NLinear / DLinear
+                       & Ba baseline tuyến tính trong LTSF-Linear: hồi quy thuần, chuẩn hóa bằng giá trị cuối,
+    và phân rã bằng trung bình trượt rồi dự báo hai nhánh.                                                                       \\
+    \addlinespace
+    Decomposition (phân rã)
+                       & Tách chuỗi thành xu hướng, mùa (và phần dư), rồi mô hình hóa từng phần.                                 \\
+    \addlinespace
+    Normalization (chuẩn hóa)
+                       & Ở đây chủ yếu là recentering/inversing bằng giá trị lookback cuối (NLinear), không phải StandardScaler. \\
+    \addlinespace
+    Data characteristics
+                       & Đặc trưng định lượng của chuỗi (độ mạnh xu hướng/mùa, mức không dừng) dùng để giải thích
+    vì sao một inductive bias thắng.                                                                                             \\
+    \addlinespace
+    Lookback \(L\)
+                       & Độ dài cửa sổ quá khứ đưa vào mô hình.                                                                  \\
+    \addlinespace
+    Horizon / pred\_len \(T\)
+                       & Độ dài đoạn tương lai cần dự báo.                                                                       \\
+    \addlinespace
+    VIC
+                       & Chuỗi giá đóng cửa hàng ngày của cổ phiếu Vingroup (HOSE), dùng \(\log(\mathrm{close})\).
+                         Đây là dữ liệu tài chính thêm vào để kiểm tra xem kết luận từ các bộ LTSF chuẩn
+                         có còn đúng trên chuỗi giá cổ phiếu (nhiễu, dễ đổi trạng thái thị trường) hay không. \\
+    \addlinespace
+    STL
+                       & Seasonal-Trend decomposition bằng Loess: tách chuỗi thành xu hướng, mùa, phần dư.                       \\
+    \addlinespace
+    Channel-independent
+                       & Mỗi kênh biến được dự báo riêng; trọng số \(W\) dùng chung giữa các kênh.                               \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\subsection{Bảng ký hiệu toán học}
+
+\begin{center}
+  \small
+  \begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.22\textwidth}
+    >{\raggedright\arraybackslash}p{0.68\textwidth}@{}}
+    \toprule
+    \textbf{Ký hiệu} & \textbf{Ý nghĩa}                                                                    \\
+    \midrule
+    \(L\)
+                     & Độ dài lookback (số bước quá khứ).                                                  \\
+    \addlinespace
+    \(T\)
+                     & Độ dài horizon (số bước dự báo). Trong STL, \(T\) cũng ký hiệu thành phần xu hướng;
+    ngữ cảnh công thức sẽ làm rõ.                                                                          \\
+    \addlinespace
+    \(C\)
+                     & Số kênh (biến) của chuỗi đa biến.                                                   \\
+    \addlinespace
+    \(x\), \(\hat{y}\)
+                     & Cửa sổ đầu vào và dự báo đầu ra.                                                    \\
+    \addlinespace
+    \(l\)
+                     & Giá trị lookback cuối cùng; NLinear trừ rồi cộng lại \(l\).                         \\
+    \addlinespace
+    \(m\)
+                     & Kích thước kernel trung bình trượt của DLinear.                                     \\
+    \addlinespace
+    \(S\), \(R\)
+                     & Thành phần mùa và phần dư từ STL.                                                   \\
+    \addlinespace
+    \(F_T\), \(F_S\)
+                     & Độ mạnh xu hướng và độ mạnh mùa (Hyndman / FPP3), nằm trong \([0,1]\).              \\
+    \addlinespace
+    \(\mathrm{MSE}\), \(\mathrm{MAE}\)
+                     & Mean Squared Error và Mean Absolute Error.                                          \\
+    \addlinespace
+    \(\Delta\)
+                     & \(\mathrm{MSE}(\mathrm{DLinear}) - \mathrm{MSE}(\mathrm{NLinear})\);
+    âm nghĩa là DLinear tốt hơn.                                                                           \\
+    \bottomrule
+  \end{tabular}
+\end{center}

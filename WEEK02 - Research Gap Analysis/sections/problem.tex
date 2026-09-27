@@ -1,0 +1,66 @@
+\section{Phát biểu vấn đề}
+\label{sec:problem}
+
+\subsection{Khoảng trống nghiên cứu}
+
+Hầu hết bài so sánh LTSF, kể cả bảng kết quả của LTSF-Linear \cite{zeng2023ltsf},
+chỉ nói model nào thắng trên từng bộ dữ liệu và từng horizon.
+Cách đó giúp xếp hạng, nhưng \textbf{chưa giúp người dùng chọn model} khi gặp chuỗi mới:
+
+\begin{quote}
+      Với một chuỗi chưa từng gặp, nên dùng phân rã (DLinear) hay chuẩn hóa bằng giá trị cuối
+      (NLinear)? Dựa vào đâu để chọn?
+\end{quote}
+
+Toner và Darlow còn chỉ ra rằng trên benchmark ``sạch'', DLinear và Linear thường gần như
+giống nhau \cite{toner2024linear}. Khi sai số trung bình gần nhau như vậy, chỉ nhìn bảng MSE
+không đủ: cần xem \textbf{đặc trưng của từng chuỗi} (xu hướng mạnh hay yếu, mùa rõ không,
+có không dừng hay không) mới giải thích được vì sao DLinear hoặc NLinear thắng.
+
+Các chỉ số độ mạnh xu hướng và mùa \cite{hyndman2021fpp3,cleveland1990stl} và hướng xử lý
+không dừng / dịch phân phối như RevIN \cite{kim2022revin} đã có sẵn trong tài liệu,
+nhưng ít bài gắn chúng vào so sánh DLinear với NLinear rồi rút ra
+\textbf{một quy tắc chọn model ngắn, dùng lại được}.
+Đó chính là khoảng trống nhóm muốn lấp.
+
+
+\subsection{Câu hỏi nghiên cứu}
+
+\begin{description}[style=nextline,leftmargin=2.2em]
+      \item[RQ1: Đặc trưng dữ liệu đến mô hình thắng.]
+            Những đặc trưng đo được nào (độ mạnh xu hướng \(F_T\), độ mạnh mùa \(F_S\),
+            và proxy không dừng / dịch mức) dự đoán DLinear hay NLinear đạt lỗi thấp hơn
+            dưới cùng một protocol?
+      \item[RQ2: Lookback và đặc trưng dữ liệu.]
+            Độ dài lookback \(L\) làm thay đổi thứ hạng tương đối của NLinear và DLinear như thế nào,
+            và pattern độ nhạy đó có phụ thuộc profile đặc trưng dữ liệu không?
+\end{description}
+
+\textbf{Đóng góp mục tiêu (các tuần sau).}
+Một scatter hoặc heatmap giữa đặc trưng dữ liệu và khoảng cách hiệu năng
+\(\Delta = \mathrm{MSE}(\mathrm{DLinear}) - \mathrm{MSE}(\mathrm{NLinear})\),
+cộng một đoạn guideline ngắn cho người thực hành.
+Giả thuyết sai vẫn là kết quả hợp lệ nếu protocol được cố định và công bố rõ.
+
+\subsection{Bộ dữ liệu}
+
+Để có phương sai về xu hướng, mùa và tính dừng, nhóm dùng các bộ LTSF chuẩn cộng thêm
+một chuỗi giá cổ phiếu (miền tài chính):
+
+\begin{center}
+      \begin{tabular}{@{}ll@{}}
+            \toprule
+            \textbf{Dataset} & \textbf{Vai trò}                                                      \\
+            \midrule
+            ETTh1, ETTh2     & Máy biến áp điện (theo giờ)                                           \\
+            Weather          & Biến khí tượng                                                        \\
+            Exchange-Rate    & Tỷ giá; thường không dừng mạnh                                        \\
+            Electricity      & Tải điện nhiều chiều                                                  \\
+            \textbf{VIC}     & Giá đóng cửa ngày cổ phiếu Vingroup (HOSE), \(\log(\mathrm{close})\);
+            dùng để kiểm tra lại trên dữ liệu tài chính                                              \\
+            \bottomrule
+      \end{tabular}
+\end{center}
+
+VIC \emph{không} phải benchmark duy nhất: nó bổ sung một chuỗi nhiễu, dễ đổi trạng thái thị trường,
+ngoài các CSV LTSF thông thường, để guideline không chỉ đúng trên kiểu điện / thời tiết.

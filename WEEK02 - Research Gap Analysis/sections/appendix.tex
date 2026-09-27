@@ -1,0 +1,70 @@
+\section{Phụ lục}
+\label{sec:appendix}
+
+\subsection{Công thức độ mạnh xu hướng và mùa}
+
+Với phân rã STL cho chuỗi univariate (hoặc kênh mục tiêu chính), gọi \(T\), \(S\), \(R\)
+lần lượt là xu hướng, mùa và phần dư. Theo Hyndman / FPP3 \cite{hyndman2021fpp3}:
+
+\begin{align*}
+  F_T &= \max\!\bigl(0,\, 1 - \mathrm{Var}(R)/\mathrm{Var}(T+R)\bigr), \\
+  F_S &= \max\!\bigl(0,\, 1 - \mathrm{Var}(R)/\mathrm{Var}(S+R)\bigr).
+\end{align*}
+
+Chu kỳ STL chọn theo sampling (ví dụ ETTh theo giờ: \(24\); chuỗi ngày: \(7\) hoặc \(365\)
+nếu đủ dài) và sẽ được ghi trong file profile WEEK02.
+
+\subsection{Lưới lookback và horizon dự kiến}
+
+\begin{center}
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Nhóm} & \textbf{Lookback \(L\)} & \textbf{Horizon \(T\)} \\
+\midrule
+LTSF chuẩn
+  & \(\{96, 192, 336, 720\}\)
+  & \(\{96, 192, 336, 720\}\) \\
+\addlinespace
+VIC (Vingroup ngày)
+  & \(\{5, 30, 120, 480\}\)
+  & \(5\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Nếu thiếu thời gian tính toán, lưới LTSF có thể cắt còn \(L \in \{96,336\}\) và
+\(T \in \{96,336\}\); mọi cắt giảm phải ghi trong protocol WEEK03.
+
+\subsection{Đường dẫn Working Files liên quan}
+
+\begin{center}
+\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.32\textwidth}
+                 >{\raggedright\arraybackslash}p{0.58\textwidth}@{}}
+\toprule
+\textbf{Nội dung} & \textbf{Đường dẫn} \\
+\midrule
+Outline (RQ, quyết định)
+  & \code{Working_Files/WEEK01_Outline.md} \\
+\addlinespace
+Reading note (cơ chế)
+  & \code{Working_Files/WEEK01_Reading_Note/} \\
+\addlinespace
+Bài research-gap này
+  & \code{Working_Files/WEEK02 - Research Gap Analysis/} \\
+\addlinespace
+Paper Tracker
+  & \code{Paper_Tracker/} \\
+\addlinespace
+Kế hoạch thực thi
+  & \code{EXECUTION_PLAN.md} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Những gì WEEK02 chưa có}
+
+Tài liệu này chưa chứa bảng MSE/MAE thực nghiệm, scatter RQ1, hay đường cong RQ2.
+Các phần đó thuộc WEEK03 (baseline) và WEEK04 (ablation + kết luận), và sẽ được gắn thêm
+vào cùng file LaTeX này.
