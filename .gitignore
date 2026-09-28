@@ -31,3 +31,17 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
+.cursor/
+
+*.egg-info/
+
+# Test artifacts
+test_src/__pycache__/
+test_src/*.pyc
+test_src/*.pyo
+test_src/*.pyd
+test_src/*.pyw
+test_src/*.pyz
+test_src/*.pywz
+test_src/*.pyzz
+.pytest_cache/
