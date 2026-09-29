@@ -2,7 +2,7 @@
 name = "dlinear-nlinear-comparison"
 version = "0.1.0"
 description = "When does DLinear beat NLinear? Data-characteristic-driven LTSF comparison."
-readme = "WEEK01_Outline.md"
+readme = "README.md"
 requires-python = ">=3.10"
 authors = [
   { name = "AIVIETNAM-AIO-TuNguyen3107", email = "tunm360481@gmail.com" },
@@ -22,6 +22,7 @@ dev = [
   "jupyter",
   "ipykernel",
   "pytest",
+  "pre-commit",
 ]
 
 [build-system]
