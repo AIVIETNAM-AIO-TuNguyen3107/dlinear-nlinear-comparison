@@ -1,0 +1,60 @@
+\section{Phương pháp đo đặc trưng}
+\label{sec:methodology}
+
+Trước khi huấn luyện và so sánh DLinear với NLinear, ta cần hiểu mỗi bộ dữ liệu
+có đặc điểm gì --- xu hướng mạnh hay yếu, mùa vụ rõ hay không, chuỗi có dừng không.
+Phần này trình bày cách nhóm đo các chỉ số \((F_T, F_S, p_{\mathrm{ADF}})\)
+để phục vụ câu hỏi RQ1: khi nào Decomposition (DLinear) thắng Normalization (NLinear)?
+
+\subsection{Phân rã STL}
+
+Với mỗi chuỗi mục tiêu \(y_t\), ta áp dụng phương pháp STL
+(Seasonal-Trend decomposition using Loess) \cite{cleveland1990stl}:
+\begin{equation}
+  y_t = T_t + S_t + R_t,
+  \label{eq:stl}
+\end{equation}
+trong đó \(T_t\) là thành phần xu hướng, \(S_t\) là thành phần mùa vụ,
+và \(R_t\) là phần dư (nhiễu). STL sử dụng phương pháp làm mượt Loess
+và có chế độ \textbf{robust} (vòng lặp bisquare) để giảm ảnh hưởng của các điểm
+bất thường. Nhóm dùng thư viện \texttt{statsmodels.tsa.seasonal.STL}
+với tùy chọn \texttt{robust=True}.
+
+Chu kỳ mùa \(m\) được chọn theo tần suất lấy mẫu (xem Bảng~\ref{tab:datasets}):
+chuỗi theo giờ dùng \(m=24\) (một ngày); chuỗi theo ngày dùng \(m=7\) (một tuần).
+Nhóm không dùng \(m=365\) vì hầu hết các chuỗi chưa đủ dài để ước lượng ổn định
+theo năm.
+
+\subsection{Độ mạnh xu hướng và mùa vụ}
+
+Theo Hyndman \& Athanasopoulos \cite{hyndman2021fpp3}, độ mạnh của xu hướng
+và mùa vụ được tính từ phương sai các thành phần trong~\eqref{eq:stl}:
+\begin{align}
+  F_T &= \max\!\Bigl(0,\; 1 - \frac{\mathrm{Var}(R)}{\mathrm{Var}(T+R)}\Bigr),
+  \label{eq:ft} \\
+  F_S &= \max\!\Bigl(0,\; 1 - \frac{\mathrm{Var}(R)}{\mathrm{Var}(S+R)}\Bigr).
+  \label{eq:fs}
+\end{align}
+Cả hai chỉ số nằm trong khoảng \([0,1]\): giá trị càng gần \(1\) nghĩa là
+thành phần đó càng nổi trội so với nhiễu. Đây là các chỉ số \textbf{mô tả},
+không phải siêu tham số của mô hình DLinear hay NLinear.
+
+\subsection{Kiểm định tính dừng (ADF)}
+
+Bên cạnh \(F_T\) và \(F_S\), nhóm còn ghi nhận \(p\)-value của kiểm định
+Augmented Dickey--Fuller (ADF) trên cùng chuỗi mục tiêu (hồi quy có hằng số,
+\texttt{autolag=AIC}). Quy ước: nếu \(p < 0{,}05\) thì bác bỏ giả thuyết
+chuỗi có nghiệm đơn vị (unit root), tức chuỗi được coi là dừng.
+ADF chỉ là một chỉ báo sơ bộ về tính không dừng; WEEK03 có thể bổ sung thêm
+tỷ số trung bình/độ lệch chuẩn giữa tập train và test nếu cần.
+
+\subsection{Phạm vi và giới hạn}
+
+\begin{itemize}
+  \item Việc đo profile sử dụng \textbf{toàn bộ} chuỗi có sẵn (mang tính mô tả),
+        khác với quá trình huấn luyện ở WEEK03 chỉ fit scaler trên phần train.
+  \item STL dùng ở đây để đo đặc trưng, \textbf{khác} với khối MA trong DLinear.
+        DLinear vẫn decomp bằng trung bình trượt khi forward \cite{zeng2023ltsf}.
+  \item Mỗi bộ dữ liệu chỉ lấy một cột mục tiêu (thường là \texttt{OT};
+        riêng VIC dùng \(\log(\mathrm{close})\)).
+\end{itemize}

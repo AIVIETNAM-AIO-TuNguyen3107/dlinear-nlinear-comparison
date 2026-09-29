@@ -1,0 +1,56 @@
+\section{Dữ liệu}
+\label{sec:data}
+
+\subsection{Các bộ dữ liệu}
+
+Nhóm sử dụng năm bộ dữ liệu benchmark phổ biến trong các nghiên cứu LTSF
+\cite{zeng2023ltsf}, cùng với một chuỗi tài chính Việt Nam (\textbf{VIC})
+để mở rộng phạm vi kiểm chứng:
+
+\begin{table}[H]
+  \centering
+  \caption{Cấu hình dữ liệu và chu kỳ STL. Các file CSV nằm trong thư mục \texttt{data/}.}
+  \label{tab:datasets}
+  \small
+  \begin{tabular}{@{}lllrl@{}}
+    \toprule
+    Dataset & File & Cột mục tiêu & \(m\) & Mô tả \\
+    \midrule
+    ETTh1         & \texttt{ETTh1.csv}       & OT    & 24 & Điện năng theo giờ \\
+    ETTh2         & \texttt{ETTh2.csv}       & OT    & 24 & Điện năng theo giờ \\
+    Weather       & \texttt{Weather.csv}     & OT    & 24 & Thời tiết (LTSF benchmark) \\
+    Exchange-Rate & \texttt{Exchange.csv}    & OT    & 7  & Tỷ giá ngoại tệ theo ngày \\
+    Electricity   & \texttt{Electricity.csv} & OT    & 24 & Phụ tải điện theo giờ \\
+    VIC           & \texttt{VIC.csv}         & close & 7  & Cổ phiếu Vingroup; dùng \(\log(\mathrm{close})\) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+VIC là giá đóng cửa hàng ngày của cổ phiếu Vingroup trên sàn HOSE.
+Nhóm lấy logarit của giá đóng cửa trước khi đưa vào STL và mô hình,
+nhằm làm việc trên thang gần với lợi suất tích lũy thay vì mức giá tuyệt đối.
+
+\subsection{Quy trình tiền xử lý}
+
+\begin{enumerate}
+  \item Đọc file CSV và trích xuất cột mục tiêu theo Bảng~\ref{tab:datasets}.
+  \item Riêng VIC: chuyển đổi \(y_t \leftarrow \log(\mathrm{close}_t)\)
+        (yêu cầu giá đóng cửa dương).
+  \item Kiểm tra và loại bỏ các giá trị NaN hoặc Inf trước khi fit STL.
+  \item Fit STL với chu kỳ \(m\) và chế độ robust; tính \(F_T\), \(F_S\)
+        theo~\eqref{eq:ft}--\eqref{eq:fs}; chạy kiểm định ADF.
+  \item Ghi kết quả mỗi bộ dữ liệu thành một dòng trong file
+        \code{WEEK02_Data_Profiles.csv}.
+\end{enumerate}
+
+Ở bước này, nhóm \textbf{không} chuẩn hóa (StandardScaler) vì các chỉ số
+\(F_T\), \(F_S\) không đổi khi nhân chuỗi với hằng số dương (theo tính chất
+của phương sai). VIC đã được lấy logarit nên không cần chuẩn hóa thêm.
+
+\subsection{Liên hệ với WEEK03}
+
+Phần loader huấn luyện (\code{src/dataset.py}) --- bao gồm cửa sổ trượt,
+chia dữ liệu theo thời gian, và fit scaler \textbf{chỉ trên tập train} ---
+sẽ được trình bày trong protocol WEEK03. Tài liệu này chỉ tập trung vào
+việc xác định \textbf{bảng đặc trưng} dùng cho phân tích scatter/heatmap RQ1
+sau này.

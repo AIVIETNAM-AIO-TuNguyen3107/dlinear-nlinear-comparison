@@ -1,0 +1,40 @@
+\section{Kết quả đo đặc trưng}
+\label{sec:results}
+
+Bảng~\ref{tab:profiles} tổng hợp kết quả đo trên sáu bộ dữ liệu.
+Các giá trị được làm tròn ba chữ số thập phân; cột ``Dừng?'' dựa trên
+ngưỡng ADF \(p < 0{,}05\).
+
+\begin{table}[H]
+  \centering
+  \caption{Độ mạnh xu hướng/mùa vụ (STL) và kiểm định ADF trên toàn bộ chuỗi.}
+  \label{tab:profiles}
+  \small
+  \begin{tabular}{@{}lcccrrr@{}}
+    \toprule
+    Dataset & \(F_T\) & \(F_S\) & \(m\) & \(n\) & ADF \(p\) & Dừng? \\
+    \midrule
+    ETTh1         & 0{,}969 & 0{,}277 & 24 & 17\,420 & 0{,}008 & có \\
+    ETTh2         & 0{,}956 & 0{,}653 & 24 & 17\,420 & 0{,}006 & có \\
+    Weather       & 0{,}971 & 0{,}876 & 24 & 52\,696 & \(\approx 0\) & có \\
+    Exchange-Rate & 0{,}997 & 0{,}000 & 7  & 7\,588  & 0{,}417 & \textbf{không} \\
+    Electricity   & 0{,}737 & 0{,}628 & 24 & 26\,304 & \(\sim 10^{-26}\) & có \\
+    VIC           & 0{,}999 & 0{,}000 & 7  & 3\,758  & 0{,}994 & \textbf{không} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\noindent\textbf{Nhận xét chính:}
+\begin{itemize}
+  \item Bốn bộ dữ liệu thuộc nhóm cảm biến/phụ tải (ETT, Weather, Electricity)
+        đều bác bỏ giả thuyết unit root (chuỗi dừng). Độ mạnh mùa vụ \(F_S\)
+        dao động từ yếu (ETTh1: \(0{,}277\)) đến rất mạnh (Weather: \(0{,}876\)).
+  \item Exchange-Rate và VIC có \(F_S = 0\) (không phát hiện mùa vụ),
+        \(F_T \approx 1\), và ADF \textbf{không} bác bỏ unit root.
+        Hai chuỗi này mang đặc điểm bước ngẫu nhiên (random walk) ---
+        phù hợp với cách NLinear trừ đi giá trị cuối trước khi dự báo,
+        thay vì cố tách mùa vụ như DLinear.
+  \item Electricity có \(F_T\) thấp nhất (\(0{,}737\)) nhưng \(F_S\) vẫn
+        ở mức trung bình--cao (\(0{,}628\)), cho thấy tín hiệu mùa vụ
+        vẫn đáng kể dù xu hướng không quá nổi bật.
+\end{itemize}

@@ -1,0 +1,32 @@
+\section{Ý nghĩa cho thiết kế thực nghiệm}
+\label{sec:implications}
+
+Kết quả đo đặc trưng giúp định hướng thiết kế baseline ở WEEK03 theo giả thuyết RQ1:
+chuỗi có \(F_S\)/\(F_T\) cao thì kỳ vọng DLinear tốt hơn; chuỗi không dừng hoặc
+hay dịch mức thì NLinear có lợi thế hoặc hai mô hình cho kết quả tương đương.
+
+\begin{examplebox}{Phân nhóm đối chứng}
+  \textbf{Nhóm nghiêng DLinear (mùa vụ/xu hướng rõ):}
+  Weather, ETTh2, Electricity --- \(F_S\) cao, chuỗi dừng.\\[0.3em]
+  \textbf{Nhóm nghiêng NLinear (không dừng, không mùa vụ):}
+  Exchange-Rate, VIC --- \(F_S = 0\), không bác bỏ unit root.\\[0.3em]
+  \textbf{Trường hợp trung gian:} ETTh1 --- xu hướng mạnh (\(F_T\) cao)
+  nhưng mùa vụ yếu; sẽ báo cáo riêng, không dùng đơn lẻ để kết luận H1.
+\end{examplebox}
+
+\begin{enumerate}
+  \item Khi vẽ biểu đồ scatter cho RQ1, trục \(X\) ưu tiên dùng \(F_S\)
+        (vì phân tách rõ nhất trong bảng); \(F_T\) và \(p_{\mathrm{ADF}}\)
+        có thể đưa vào trục phụ hoặc ghi chú.
+  \item VIC (\(n \approx 3{,}800\)) và Exchange (\(n \approx 7{,}600\))
+        ngắn hơn nhiều so với Weather (\(n \approx 53{,}000\)).
+        Cần ghi rõ lưới lookback/horizon và số seed trong protocol
+        để tránh kết luận quá mức từ mẫu nhỏ.
+  \item Bảng~\ref{tab:profiles} là đầu vào cố định cho heatmap WEEK04.
+        Nếu thay đổi chu kỳ \(m\) của STL, cần chạy lại script và cập nhật CSV.
+\end{enumerate}
+
+\vspace{0.5em}
+\noindent\textit{File liên quan:}
+\code{Working_Files/WEEK02_Data_Profiles.csv},
+\code{Working_Files/src/data_chars.py}.
