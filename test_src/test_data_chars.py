@@ -18,7 +18,11 @@ from src.data_chars import (
 
 def test_stl_strengths_in_unit_interval():
     t = np.arange(200, dtype=float)
-    y = 0.01 * t + np.sin(2 * np.pi * t / 7) + 0.05 * np.random.default_rng(1).normal(size=200)
+    y = (
+        0.01 * t
+        + np.sin(2 * np.pi * t / 7)
+        + 0.05 * np.random.default_rng(1).normal(size=200)
+    )
     out = stl_strengths(y, period=7)
     assert 0.0 <= out["F_T"] <= 1.0
     assert 0.0 <= out["F_S"] <= 1.0

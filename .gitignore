@@ -35,6 +35,10 @@ Thumbs.db
 
 *.egg-info/
 
+# Datasets (downloaded by src/scripts/download_data.py)
+data/*.csv
+data/.cache/
+
 # Test artifacts
 test_src/__pycache__/
 test_src/*.pyc
