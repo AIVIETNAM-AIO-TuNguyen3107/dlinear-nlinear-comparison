@@ -69,5 +69,12 @@ class Config(BaseSettings):
 
     VIC_TICKER: str = "VIC.VN"
 
+    def get_spec(self, name: str) -> dict[str, Any]:
+        for spec in self.DATASET_SPECS:
+            if spec["name"] == name:
+                return spec
+        known = [s["name"] for s in self.DATASET_SPECS]
+        raise KeyError(f"unknown dataset {name!r}; known: {known}")
+
 
 settings = Config()
