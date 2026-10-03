@@ -1,4 +1,4 @@
-"""Smoke tests for src.data_chars (EXECUTION_PLAN §2.2)."""
+"""Smoke tests for src.scripts.data_chars (EXECUTION_PLAN §2.2)."""
 
 from pathlib import Path
 
@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from src.data_chars import (
+from src.scripts.data_chars import (
     PROFILE_FIELDS,
     load_series,
     profile_data_dir,

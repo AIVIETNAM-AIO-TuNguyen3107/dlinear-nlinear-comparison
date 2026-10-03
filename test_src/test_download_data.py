@@ -1,6 +1,7 @@
 from pathlib import Path
 
-from src.scripts.download_data import LTSF_TARGETS, ensure_ltsf, is_ready
+from src.config import settings
+from src.scripts.download_data import ensure_ltsf, is_ready
 
 
 def test_is_ready_false_missing(tmp_path: Path):
@@ -20,7 +21,7 @@ def test_is_ready_true_nonempty(tmp_path: Path):
 
 
 def test_ltsf_local_names():
-    assert set(LTSF_TARGETS) == {
+    assert set(settings.LTSF_TARGETS) == {
         "ETTh1.csv",
         "ETTh2.csv",
         "Weather.csv",
@@ -30,8 +31,8 @@ def test_ltsf_local_names():
 
 
 def test_ensure_ltsf_skips_when_present(tmp_path: Path):
-    for name in LTSF_TARGETS:
+    for name in settings.LTSF_TARGETS:
         (tmp_path / name).write_text("x")
     actions = ensure_ltsf(tmp_path, tmp_path / ".cache")
     assert all(a.startswith("skip:") for a in actions)
-    assert len(actions) == len(LTSF_TARGETS)
+    assert len(actions) == len(settings.LTSF_TARGETS)

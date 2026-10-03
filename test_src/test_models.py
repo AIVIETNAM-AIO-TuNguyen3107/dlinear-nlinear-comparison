@@ -1,9 +1,9 @@
-"""Smoke tests for src.models (EXECUTION_PLAN §2.1 shapes / param counts)."""
+"""Smoke tests for src.pipeline.models (EXECUTION_PLAN §2.1 shapes / param counts)."""
 
 import pytest
 import torch
 
-from src.models import DLinear, Linear, MovingAvg, NLinear
+from src.pipeline.models import DLinear, Linear, MovingAvg, NLinear
 
 
 @pytest.fixture

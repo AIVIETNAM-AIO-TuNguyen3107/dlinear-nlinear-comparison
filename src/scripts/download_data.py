@@ -7,25 +7,11 @@ VIC (VIC.VN / VinGroup close) comes from yfinance.
 from __future__ import annotations
 
 import shutil
-import sys
 import urllib.request
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
-DATA_DIR = ROOT / "data"
-CACHE_DIR = DATA_DIR / ".cache"
-
-# local name -> remote path under HF dataset root
-HF_BASE = "https://huggingface.co/datasets/thuml/Time-Series-Library/resolve/main"
-LTSF_TARGETS: dict[str, str] = {
-    "ETTh1.csv": "ETT-small/ETTh1.csv",
-    "ETTh2.csv": "ETT-small/ETTh2.csv",
-    "Weather.csv": "weather/weather.csv",
-    "Exchange.csv": "exchange_rate/exchange_rate.csv",
-    "Electricity.csv": "electricity/electricity.csv",
-}
-
-VIC_TICKER = "VIC.VN"
+from src.config import settings
+from src.utils import logger
 
 
 def is_ready(path: Path) -> bool:
@@ -53,17 +39,21 @@ def ensure_ltsf(data_dir: Path, cache_dir: Path) -> list[str]:
     ensure_dir(data_dir)
     ensure_dir(cache_dir)
     actions: list[str] = []
-    for local_name, remote_path in LTSF_TARGETS.items():
+    for local_name, remote_path in settings.LTSF_TARGETS.items():
         dest = data_dir / local_name
         if is_ready(dest):
+            logger.info("skip", local_name=local_name)
             actions.append(f"skip:{local_name}")
             continue
         cache_file = cache_dir / remote_path.replace("/", "__")
         if not is_ready(cache_file):
-            url = f"{HF_BASE}/{remote_path}"
-            print(f"download {local_name} <- {url}")
+            url = f"{settings.HF_BASE}/{remote_path}"
+            logger.info(
+                "download_start", dest=str(dest), local_name=local_name, url=url
+            )
             download_url(url, cache_file)
         shutil.copy2(cache_file, dest)
+        logger.info("download_success", dest=str(dest), local_name=local_name)
         actions.append(f"downloaded:{local_name}")
     return actions
 
@@ -73,15 +63,17 @@ def ensure_vic(data_dir: Path) -> str:
     ensure_dir(data_dir)
     dest = data_dir / "VIC.csv"
     if is_ready(dest):
+        logger.info("skip", local_name="VIC.csv")
         return "skip:VIC.csv"
-
     import pandas as pd
     import yfinance as yf  # lazy: only needed when VIC missing
 
-    print(f"download VIC.csv <- yfinance {VIC_TICKER}")
-    df = yf.download(VIC_TICKER, period="max", progress=False, auto_adjust=True)
+    logger.info("download_start", ticker=settings.VIC_TICKER)
+    df = yf.download(
+        settings.VIC_TICKER, period="max", progress=False, auto_adjust=True
+    )
     if df is None or df.empty:
-        raise RuntimeError(f"yfinance returned empty data for {VIC_TICKER}")
+        raise RuntimeError(f"yfinance returned empty data for {settings.VIC_TICKER}")
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = [c[0] if isinstance(c, tuple) else c for c in df.columns]
     out = df.reset_index()
@@ -91,28 +83,19 @@ def ensure_vic(data_dir: Path) -> str:
         columns={date_col: "date", close_col: "close"}
     )
     slim.to_csv(dest, index=False)
+    logger.info("download_success", ticker=settings.VIC_TICKER)
     return "downloaded:VIC.csv"
 
 
-def main() -> int:
-    ensure_dir(DATA_DIR)
-    actions = ensure_ltsf(DATA_DIR, CACHE_DIR)
-    try:
-        actions.append(ensure_vic(DATA_DIR))
-    except Exception as exc:  # noqa: BLE001 — report and fail exit
-        print(f"failed:VIC.csv ({exc})", file=sys.stderr)
-        actions.append("failed:VIC.csv")
-
-    for a in actions:
-        print(a)
-
-    expected = list(LTSF_TARGETS) + ["VIC.csv"]
-    missing = [n for n in expected if not is_ready(DATA_DIR / n)]
-    if missing:
-        print(f"missing after run: {missing}", file=sys.stderr)
-        return 1
-    return 0
+def download_data(
+    data_dir: Path | str = settings.data_dir, cache_dir: Path | str = settings.cache_dir
+) -> list[str]:
+    ensure_dir(data_dir)
+    ensure_dir(cache_dir)
+    actions = ensure_ltsf(Path(data_dir), Path(cache_dir))
+    actions.append(ensure_vic(Path(data_dir)))
+    return actions
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    download_data()

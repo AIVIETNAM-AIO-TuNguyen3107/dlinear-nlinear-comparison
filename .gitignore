@@ -49,3 +49,7 @@ test_src/*.pyz
 test_src/*.pywz
 test_src/*.pyzz
 .pytest_cache/
+
+
+# docs
+docs/superpowers/

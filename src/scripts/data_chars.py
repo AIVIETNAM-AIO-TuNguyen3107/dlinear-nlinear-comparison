@@ -16,56 +16,8 @@ import pandas as pd
 from statsmodels.tsa.seasonal import STL
 from statsmodels.tsa.stattools import adfuller
 
-# Working_Files/data/ — fill later (W3 loaders may share this layout)
-DATA_DIR = Path(__file__).resolve().parents[1] / "data"
-DEFAULT_PROFILES_CSV = Path(__file__).resolve().parents[1] / "WEEK02_Data_Profiles.csv"
-
-# period: ETTh hourly → 24; daily series → 7 (document in notes; use 365 only if long enough)
-DATASET_SPECS: list[dict[str, Any]] = [
-    {
-        "name": "ETTh1",
-        "file": "ETTh1.csv",
-        "column": "OT",
-        "period": 24,
-        "notes": "hourly; STL period=24; target OT",
-    },
-    {
-        "name": "ETTh2",
-        "file": "ETTh2.csv",
-        "column": "OT",
-        "period": 24,
-        "notes": "hourly; STL period=24; target OT",
-    },
-    {
-        "name": "Weather",
-        "file": "Weather.csv",
-        "column": "OT",
-        "period": 24,
-        "notes": "Weather LTSF; STL period=24; target OT",
-    },
-    {
-        "name": "Exchange-Rate",
-        "file": "Exchange.csv",
-        "column": "OT",
-        "period": 7,
-        "notes": "daily FX; STL period=7; target OT",
-    },
-    {
-        "name": "Electricity",
-        "file": "Electricity.csv",
-        "column": "OT",
-        "period": 24,
-        "notes": "hourly electricity; STL period=24; target OT",
-    },
-    {
-        "name": "VIC",
-        "file": "VIC.csv",
-        "column": "close",
-        "period": 7,
-        "log": True,
-        "notes": "VNM Vingroup daily close; log(close); STL period=7",
-    },
-]
+from src.config import settings
+from src.utils import logger
 
 PROFILE_FIELDS = (
     "dataset",
@@ -78,49 +30,13 @@ PROFILE_FIELDS = (
 )
 
 
-def _as_1d(y: np.ndarray | Sequence[float]) -> np.ndarray:
+def as_1d(y: np.ndarray | Sequence[float]) -> np.ndarray:
     arr = np.asarray(y, dtype=float).ravel()
     if arr.size < 2:
         raise ValueError("series must have length >= 2")
     if not np.isfinite(arr).all():
         raise ValueError("series contains NaN/Inf")
     return arr
-
-
-def _strength(var_comp_plus_r: float, var_r: float) -> float:
-    if var_comp_plus_r <= 0 or not np.isfinite(var_comp_plus_r):
-        return 0.0
-    return float(max(0.0, 1.0 - var_r / var_comp_plus_r))
-
-
-def stl_strengths(
-    y: np.ndarray | Sequence[float],
-    period: int,
-    *,
-    robust: bool = True,
-) -> dict[str, float]:
-    """Fit STL and return F_T, F_S in [0, 1] (FPP3)."""
-    if period < 2:
-        raise ValueError("period must be >= 2")
-    arr = _as_1d(y)
-    if arr.size < 2 * period:
-        raise ValueError(f"need length >= 2*period ({2 * period}), got {arr.size}")
-
-    res = STL(arr, period=period, robust=robust).fit()
-    T, S, R = np.asarray(res.trend), np.asarray(res.seasonal), np.asarray(res.resid)
-    var_r = float(np.var(R))
-    return {
-        "F_T": _strength(float(np.var(T + R)), var_r),
-        "F_S": _strength(float(np.var(S + R)), var_r),
-    }
-
-
-def adf_pvalue(y: np.ndarray | Sequence[float]) -> float:
-    """ADF unit-root test p-value (non-stationarity proxy)."""
-    arr = _as_1d(y)
-    # autolag AIC; regression with constant
-    stat = adfuller(arr, autolag="AIC", result_object=True)
-    return float(stat.pvalue)
 
 
 def load_series(
@@ -145,7 +61,43 @@ def load_series(
         if np.any(y <= 0):
             raise ValueError("log=True requires strictly positive values")
         y = np.log(y)
-    return _as_1d(y)
+    return as_1d(y)
+
+
+def _strength(var_comp_plus_r: float, var_r: float) -> float:
+    if var_comp_plus_r <= 0 or not np.isfinite(var_comp_plus_r):
+        return 0.0
+    return float(max(0.0, 1.0 - var_r / var_comp_plus_r))
+
+
+def stl_strengths(
+    y: np.ndarray | Sequence[float],
+    period: int,
+    *,
+    robust: bool = True,
+) -> dict[str, float]:
+    """Fit STL and return F_T, F_S in [0, 1] (FPP3)."""
+    if period < 2:
+        raise ValueError("period must be >= 2")
+    arr = as_1d(y)
+    if arr.size < 2 * period:
+        raise ValueError(f"need length >= 2*period ({2 * period}), got {arr.size}")
+
+    res = STL(arr, period=period, robust=robust).fit()
+    T, S, R = np.asarray(res.trend), np.asarray(res.seasonal), np.asarray(res.resid)
+    var_r = float(np.var(R))
+    return {
+        "F_T": _strength(float(np.var(T + R)), var_r),
+        "F_S": _strength(float(np.var(S + R)), var_r),
+    }
+
+
+def adf_pvalue(y: np.ndarray | Sequence[float]) -> float:
+    """ADF unit-root test p-value (non-stationarity proxy)."""
+    arr = as_1d(y)
+    # autolag AIC; regression with constant
+    stat = adfuller(arr, autolag="AIC", result_object=True)
+    return float(stat.pvalue)
 
 
 def profile_dataset(
@@ -160,10 +112,11 @@ def profile_dataset(
     notes: str = "",
 ) -> dict[str, Any]:
     """Profile one series: STL strengths (+ optional ADF)."""
+    logger.debug(f"Profiling dataset: {name}, period={period}, log={log}")
     if isinstance(path_or_array, (str, Path)):
         y = load_series(path_or_array, column=column, log=log)
     else:
-        y = _as_1d(path_or_array)
+        y = as_1d(path_or_array)
         if log:
             if np.any(y <= 0):
                 raise ValueError("log=True requires strictly positive values")
@@ -179,12 +132,15 @@ def profile_dataset(
         "adf_pvalue": adf_pvalue(y) if with_adf else "",
         "notes": notes,
     }
+    logger.info(
+        f"Profiled {name}: F_T={row['F_T']:.4f}, F_S={row['F_S']:.4f}, n={row['n']}, period={row['period']}"
+    )
     return row
 
 
 def write_profiles(
     rows: Sequence[Mapping[str, Any]],
-    out_csv: str | Path = DEFAULT_PROFILES_CSV,
+    out_csv: str | Path = settings.profiles_csv,
 ) -> Path:
     """Write profile rows to CSV (columns: dataset, F_T, F_S, …)."""
     out = Path(out_csv)
@@ -194,12 +150,13 @@ def write_profiles(
         writer.writeheader()
         for row in rows:
             writer.writerow({k: row.get(k, "") for k in PROFILE_FIELDS})
+    logger.info(f"Wrote {len(rows)} profile rows to {out}")
     return out
 
 
 def profile_data_dir(
-    data_dir: str | Path = DATA_DIR,
-    specs: Sequence[Mapping[str, Any]] = DATASET_SPECS,
+    data_dir: str | Path = settings.data_dir,
+    specs: Sequence[Mapping[str, Any]] = settings.DATASET_SPECS,
     *,
     robust: bool = True,
     with_adf: bool = True,
@@ -210,6 +167,7 @@ def profile_data_dir(
     for spec in specs:
         path = root / spec["file"]
         if not path.is_file():
+            logger.warning(f"Missing file {path}, skipping...")
             continue
         rows.append(
             profile_dataset(
@@ -223,6 +181,7 @@ def profile_data_dir(
                 notes=str(spec.get("notes", "")),
             )
         )
+    logger.info(f"Profiled {len(rows)} datasets from {data_dir}")
     return rows
 
 
@@ -239,22 +198,21 @@ if __name__ == "__main__":
     rows = profile_data_dir()
     if rows:
         path = write_profiles(rows)
-        print(f"wrote {len(rows)} rows → {path}")
+        logger.info(f"Wrote {len(rows)} rows → {path}")
         for r in rows:
-            print(
-                f"  {r['dataset']}: F_T={r['F_T']:.4f} F_S={r['F_S']:.4f} "
-                f"period={r['period']} n={r['n']}"
+            logger.info(
+                f"{r['dataset']}: F_T={r['F_T']:.4f} F_S={r['F_S']:.4f} period={r['period']} n={r['n']}"
             )
     else:
-        print(
-            f"no CSVs in {DATA_DIR}; expected e.g. ETTh1.csv, VIC.csv — skip CSV write"
+        logger.warning(
+            f"No CSVs in {settings.data_dir}; expected e.g. ETTh1.csv, VIC.csv — skip CSV write"
         )
         smoke = profile_dataset(
             _smoke_series(), period=7, name="smoke", notes="synthetic"
         )
         assert 0.0 <= smoke["F_T"] <= 1.0 and 0.0 <= smoke["F_S"] <= 1.0
         assert smoke["F_S"] > 0.5, smoke
-        print(
+        logger.info(
             f"smoke ok: F_T={smoke['F_T']:.4f} F_S={smoke['F_S']:.4f} "
             f"adf_p={smoke['adf_pvalue']:.4g}"
         )

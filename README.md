@@ -31,12 +31,16 @@ Part of AIO Module 4 (AIVIETNAM). Research outline: [`WEEK01_Outline.md`](WEEK01
 Working_Files/
 ├── data/                 # CSVs (gitignored; download script fills this)
 ├── src/
-│   ├── models.py         # Linear, NLinear, DLinear
-│   ├── data_chars.py     # STL strengths (F_T, F_S), ADF
-│   ├── dataset.py        # (W3) loaders
-│   ├── eval.py           # (W4) metrics / ablation helpers
+│   ├── config.py             # paths, dataset specs, download targets
+│   ├── pipeline/
+│   │   ├── models.py         # Linear, NLinear, DLinear
+│   │   ├── dataset.py        # (W3) forecast window loaders
+│   │   └── eval.py           # (W4) metrics / ablation helpers
+│   ├── utils/
+│   │   └── logger.py         # structlog setup
 │   └── scripts/
-│       └── download_data.py
+│       ├── data_chars.py     # STL strengths (F_T, F_S), ADF; load_series
+│       └── download_data.py  # HF + Yahoo Finance CSVs
 ├── test_src/             # pytest
 ├── notebooks/ / WEEK0*   # weekly notes & experiments
 ├── pyproject.toml
@@ -86,7 +90,7 @@ Second run should print `skip:…` for every file.
 After data is present:
 
 ```bash
-uv run python src/data_chars.py
+uv run python src/scripts/data_chars.py
 ```
 
 Writes / updates profile metrics (see module docstring; expects CSVs in `data/`).
@@ -101,7 +105,7 @@ uv run pytest
 
 ## Models (scratch)
 
-Implemented in `src/models.py` (channel-independent, shared weights):
+Implemented in `src/pipeline/models.py` (channel-independent, shared weights):
 
 - **Linear** — one linear map lookback → horizon
 - **NLinear** — subtract last value, linear, add back
