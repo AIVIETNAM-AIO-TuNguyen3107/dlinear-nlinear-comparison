@@ -1,0 +1,165 @@
+\section{Kết quả baseline}
+\label{sec:results}
+
+Mọi số MSE dưới đây đã chọn \(\eta\) (tốc độ học) trong lưới
+\(\{0{,}005;\,0{,}001;\,0{,}0005\}\) theo quy tắc ở Mục~\ref{sec:setup}:
+với mỗi \((\mathrm{model},\mathrm{dataset},L,H)\) giữ lần thử có test MSE nhỏ nhất.
+
+\subsection{Mô hình nào thắng bao nhiêu ô? (tổng quan trước RQ1)}
+
+Trên \(84\) ô \((\mathrm{dataset},L,H)\), số lần mỗi mô hình đạt MSE thấp nhất
+được tổng hợp ở Bảng~\ref{tab:wins}. Đây mới là thống kê sơ bộ;
+phần gắn với đặc trưng dữ liệu (RQ1) nằm ở Bảng~\ref{tab:meanmse}
+và Mục~\ref{sec:discussion}.
+
+\begin{table}[H]
+  \centering
+  \caption{Số ô thắng theo test MSE (sau khi chọn \(\eta\) trong lưới ba giá trị).}
+  \label{tab:wins}
+  \begin{tabular}{@{}lrr@{}}
+    \toprule
+    Mô hình & Số ô thắng & Tỷ lệ    \\
+    \midrule
+    NLinear & 50         & \(60\%\) \\
+    DLinear & 20         & \(24\%\) \\
+    Linear  & 14         & \(17\%\) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+NLinear thắng nhiều nhất về số ô, nhưng \textbf{không thống trị mọi bộ dữ liệu}.
+Bảng~\ref{tab:meanmse} cho MSE trung bình theo bộ dữ liệu (trung bình trên mọi \(L,H\)),
+kèm phân nhóm RQ1 từ Bảng~\ref{tab:profiles}.
+
+\begin{table}[H]
+  \centering
+  \caption{Test MSE trung bình theo bộ dữ liệu (sau chọn \(\eta\); càng thấp càng tốt).
+    Cột nhóm: phân loại theo kỳ vọng RQ1. In đậm: thấp nhất trong hàng.}
+  \label{tab:meanmse}
+  \small
+  \begin{tabular}{@{}llcccc@{}}
+    \toprule
+    Bộ dữ liệu    & Nhóm RQ1       & Linear           & NLinear           & DLinear           & Thắng           \\
+    \midrule
+    ETTh1         & B (trung gian) & 0{,}106          & \textbf{0{,}074}  & 0{,}104           & NLinear         \\
+    ETTh2         & A (mùa rõ)     & 0{,}206          & \textbf{0{,}187}  & 0{,}205           & NLinear         \\
+    Weather       & A (mùa rõ)     & 0{,}0068         & \textbf{0{,}0015} & 0{,}0065          & NLinear         \\
+    Electricity   & A (mùa rõ)     & \textbf{0{,}241} & 0{,}252           & 0{,}244           & Linear          \\
+    Exchange-Rate & C (không dừng) & 0{,}272          & 0{,}677           & \textbf{0{,}249}  & DLinear         \\
+    VIC           & C (không dừng) & 0{,}012          & \textbf{0{,}0070} & \textbf{0{,}0070} & N \(\approx\) D \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Đọc nhanh theo RQ1 (mô tả, chưa kết luận):
+
+\begin{enumerate}
+  \item \textbf{Nhóm A:} theo kỳ vọng thì DLinear có lợi thế, nhưng Weather/ETTh2 lại do NLinear thắng;
+        Electricity gần như hòa (Linear tốt hơn một chút). Đây là tín hiệu cần kiểm tra lại H1 ở WEEK04.
+  \item \textbf{Nhóm B (ETTh1):} NLinear thắng rõ --- phù hợp hơn với câu chuyện dịch chuyển phân phối
+        trên ETT trong paper \cite{zeng2023ltsf} hơn là với \(F_S\) cao.
+  \item \textbf{Nhóm C:} theo kỳ vọng thì NLinear có lợi thế; VIC đúng hướng (N \(\approx\) D, cả hai
+        tốt hơn Linear), còn Exchange-Rate \textbf{ngược kỳ vọng}: DLinear thắng, MSE của NLinear
+        tăng vọt ở tầm dự báo dài.
+\end{enumerate}
+
+\begin{infobox}{Tại sao không lấy trung bình toàn cục?}
+  Trung bình MSE gộp mọi bộ dữ liệu bị \textbf{kéo lệch} bởi các ô Exchange \(H{=}720\)
+  (NLinear \(\approx 1{,}6\)). Vì vậy, báo cáo này phân tích theo từng bộ dữ liệu và tầm dự báo
+  thay vì gộp một con số trung bình rồi kết luận ``mô hình X thắng''.
+\end{infobox}
+
+\subsection{MSE theo tầm dự báo (và liên hệ RQ2)}
+
+Bảng~\ref{tab:bestL}: với mỗi \((\mathrm{dataset},H)\), lấy MSE nhỏ nhất
+khi duyệt qua các giá trị \(L\) (và \(\eta\) trong lưới ba giá trị).
+Cách trình bày này gần với bảng trong paper gốc \cite{zeng2023ltsf}.
+Việc \(L\) tối ưu thay đổi theo bộ dữ liệu chính là quan sát sơ bộ cho \textbf{RQ2};
+đường cong đầy đủ MSE theo \(L\) sẽ vẽ ở WEEK04.
+
+\begin{table}[H]
+  \centering
+  \caption{Test MSE tốt nhất khi duyệt qua \(L\) (sau chọn \(\eta\)).
+    In đậm: tốt nhất trong nhóm ba mô hình.}
+  \label{tab:bestL}
+  \scriptsize
+  \setlength{\tabcolsep}{3.5pt}
+  \begin{tabular}{@{}llcccc@{}}
+    \toprule
+    Bộ dữ liệu  & \(H\) & Linear           & NLinear           & DLinear          & Thắng \\
+    \midrule
+    ETTh1       & 96    & 0{,}059          & \textbf{0{,}055}  & 0{,}055          & N     \\
+    ETTh1       & 192   & 0{,}076          & \textbf{0{,}069}  & 0{,}074          & N     \\
+    ETTh1       & 336   & 0{,}085          & \textbf{0{,}080}  & 0{,}088          & N     \\
+    ETTh1       & 720   & 0{,}135          & \textbf{0{,}079}  & 0{,}131          & N     \\
+    \midrule
+    ETTh2       & 96    & 0{,}129          & \textbf{0{,}126}  & 0{,}128          & N     \\
+    ETTh2       & 192   & 0{,}181          & \textbf{0{,}173}  & 0{,}175          & N     \\
+    ETTh2       & 336   & 0{,}204          & 0{,}197           & \textbf{0{,}195} & D     \\
+    ETTh2       & 720   & 0{,}247          & \textbf{0{,}223}  & 0{,}248          & N     \\
+    \midrule
+    Weather     & 96    & 0{,}0055         & \textbf{0{,}0010} & 0{,}0044         & N     \\
+    Weather     & 192   & 0{,}0062         & \textbf{0{,}0013} & 0{,}0063         & N     \\
+    Weather     & 336   & 0{,}0071         & \textbf{0{,}0015} & 0{,}0068         & N     \\
+    Weather     & 720   & 0{,}0073         & \textbf{0{,}0019} & 0{,}0069         & N     \\
+    \midrule
+    Exchange    & 96    & 0{,}092          & 0{,}093           & \textbf{0{,}090} & D     \\
+    Exchange    & 192   & 0{,}193          & 0{,}225           & \textbf{0{,}178} & D     \\
+    Exchange    & 336   & 0{,}253          & 0{,}523           & \textbf{0{,}242} & D     \\
+    Exchange    & 720   & 0{,}316          & 1{,}626           & \textbf{0{,}275} & D     \\
+    \midrule
+    Electricity & 96    & \textbf{0{,}166} & 0{,}173           & 0{,}172          & L     \\
+    Electricity & 192   & 0{,}193          & \textbf{0{,}192}  & 0{,}193          & N     \\
+    Electricity & 336   & \textbf{0{,}210} & 0{,}217           & 0{,}212          & L     \\
+    Electricity & 720   & \textbf{0{,}258} & 0{,}272           & 0{,}265          & L     \\
+    \midrule
+    VIC         & 5     & 0{,}0084         & \textbf{0{,}0060} & 0{,}0062         & N     \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Trên ETT, khoảng cách giữa NLinear và DLinear/Linear thường \textbf{rộng hơn ở \(H{=}720\)}
+(hữu ích khi phân tích RQ1 theo tầm dự báo, không chỉ theo giá trị trung bình).
+Trên Exchange, MSE của NLinear tăng mạnh theo \(H\) --- xu hướng đối lập với ETT.
+
+\subsection{Đối chiếu với paper (univariate ETTh1, \(L{=}96\))}
+
+Với ETTh1 đơn biến, độ dài cửa sổ \(96\), kết quả của chúng tôi
+(sau chọn \(\eta\) trong lưới) so với phụ lục của paper gốc \cite{zeng2023ltsf}:
+
+\begin{table}[H]
+  \centering
+  \caption{ETTh1 đơn biến, \(L{=}96\): kết quả của chúng tôi so với paper.}
+  \label{tab:paper}
+  \small
+  \begin{tabular}{@{}rlll@{}}
+    \toprule
+    \(H\) & Mô hình & Chúng tôi & Paper   \\
+    \midrule
+    96    & NLinear & 0{,}055   & 0{,}053 \\
+    96    & DLinear & 0{,}070   & 0{,}056 \\
+    96    & Linear  & 0{,}062   & 0{,}189 \\
+    192   & NLinear & 0{,}074   & 0{,}069 \\
+    192   & DLinear & 0{,}078   & 0{,}071 \\
+    720   & NLinear & 0{,}085   & 0{,}080 \\
+    720   & DLinear & 0{,}169   & 0{,}189 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+NLinear bám sát kết quả paper; DLinear ở cùng bậc độ lớn.
+Linear của chúng tôi tốt hơn rõ ở \(H{=}96\) (do khác cách huấn luyện / lưới \(\eta\)),
+nên chỉ dùng làm baseline nội bộ, không coi là tái hiện chính xác Linear của paper.
+
+\subsection{Quan sát phụ liên quan RQ2 và tốc độ học}
+
+\begin{itemize}
+  \item \textbf{RQ2 (sơ bộ):} không có quy luật ``\(L\) càng dài càng tốt'' trên mọi bộ dữ liệu.
+        Ví dụ: ETTh1 \(H{=}96\) ưu tiên \(L{=}336\); nhiều ô ETTh2 / Exchange với \(H\) ngắn
+        ưu tiên \(L{=}96\); VIC ưu tiên \(L{=}5\).
+        Đường cong MSE theo \(L\) cho từng mô hình sẽ vẽ ở WEEK04.
+  \item \textbf{Tốc độ học:} trong \(252\) ô, \(\eta{=}0{,}0005\) được chọn \(154\) lần,
+        \(\eta{=}0{,}001\) được chọn \(84\) lần, \(\eta{=}0{,}005\) chỉ \(14\) lần.
+        Trên lưới này, \(\eta\) nhỏ thường cho test MSE ổn định hơn ---
+        đây là ghi chú về huấn luyện, không phải phát biểu của RQ1/RQ2.
+\end{itemize}

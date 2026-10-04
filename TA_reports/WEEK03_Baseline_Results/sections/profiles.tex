@@ -1,0 +1,51 @@
+\section{Đặc trưng dữ liệu gắn với RQ1}
+\label{sec:profiles}
+
+RQ1 hỏi liệu \(F_T\), \(F_S\) và tính không dừng có giúp dự báo được
+DLinear hay NLinear sẽ thắng. Do đó, trước khi đọc bảng MSE cần gắn sáu bộ dữ liệu
+vào các đặc trưng đã đo bằng STL \cite{cleveland1990stl,hyndman2021fpp3}
+và kiểm định ADF (Bảng~\ref{tab:profiles}, từ \code{WEEK02_Data_Profiles.csv}).
+
+\begin{align*}
+  F_T &= \max\!\bigl(0,\, 1 - \mathrm{Var}(R)/\mathrm{Var}(T+R)\bigr), \\
+  F_S &= \max\!\bigl(0,\, 1 - \mathrm{Var}(R)/\mathrm{Var}(S+R)\bigr),
+\end{align*}
+với \(T,S,R\) lần lượt là xu hướng, thành phần mùa vụ và phần dư từ STL;
+chu kỳ \(m\) theo tần số lấy mẫu.
+Hiệu số có dấu dùng cho RQ1:
+\(\Delta = \mathrm{MSE}(\mathrm{DLinear}) - \mathrm{MSE}(\mathrm{NLinear})\)
+(âm \(\Rightarrow\) DLinear tốt hơn).
+
+\begin{table}[H]
+  \centering
+  \caption{Độ mạnh xu hướng/mùa vụ (STL) và kiểm định ADF --- đầu vào của RQ1.}
+  \label{tab:profiles}
+  \small
+  \begin{tabular}{@{}lcccrrr@{}}
+    \toprule
+    Bộ dữ liệu & \(F_T\) & \(F_S\) & \(m\) & \(n\) & ADF \(p\) & Dừng? \\
+    \midrule
+    ETTh1         & 0{,}969 & 0{,}277 & 24 & 17\,420 & 0{,}008 & có \\
+    ETTh2         & 0{,}956 & 0{,}653 & 24 & 17\,420 & 0{,}006 & có \\
+    Weather       & 0{,}971 & 0{,}876 & 24 & 52\,696 & \(\approx 0\) & có \\
+    Exchange-Rate & 0{,}997 & 0{,}000 & 7  & 7\,588  & 0{,}417 & \textbf{không} \\
+    Electricity   & 0{,}737 & 0{,}628 & 24 & 26\,304 & \(\sim 10^{-26}\) & có \\
+    VIC           & 0{,}999 & 0{,}000 & 7  & 3\,758  & 0{,}994 & \textbf{không} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{examplebox}{Phân nhóm dữ liệu theo kỳ vọng RQ1 (giả thuyết H1)}
+  Giả thuyết làm việc (WEEK02): \(F_S\)/\(F_T\) cao \(\Rightarrow\) có lợi cho DLinear;
+  không dừng / dịch chuyển mức mạnh \(\Rightarrow\) có lợi cho NLinear hoặc \(\lvert\Delta\rvert\) nhỏ.\\[0.35em]
+  \textbf{Nhóm A --- mùa vụ rõ, chuỗi dừng:} Weather (\(F_S{=}0{,}876\)), ETTh2 (\(0{,}653\)),
+  Electricity (\(0{,}628\)).\\[0.2em]
+  \textbf{Nhóm B --- trung gian:} ETTh1 (\(F_S{=}0{,}277\), \(F_T{=}0{,}969\)).\\[0.2em]
+  \textbf{Nhóm C --- không có mùa vụ, không dừng:} Exchange-Rate, VIC
+  (\(F_S{=}0\), ADF không bác bỏ nghiệm đơn vị).
+\end{examplebox}
+
+\noindent
+Phần~\ref{sec:results}--\ref{sec:discussion} đọc MSE theo các nhóm A/B/C của RQ1
+và ghi nhận xu hướng liên quan RQ2 (độ dài cửa sổ), nhưng
+\textbf{chưa kết luận} H1 (thiếu biểu đồ scatter \(\Delta\) theo \(F_S\) và kiểm định hệ thống).

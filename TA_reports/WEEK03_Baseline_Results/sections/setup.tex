@@ -1,0 +1,68 @@
+\section{Thiết lập thực nghiệm}
+\label{sec:setup}
+
+\subsection{Câu hỏi nghiên cứu (nhắc lại)}
+
+Hai câu hỏi nghiên cứu (RQ) định hướng cách đọc mọi bảng MSE bên dưới:
+
+\begin{description}
+  \item[RQ1.] Đặc trưng nào của chuỗi (\(F_T\), \(F_S\), tính không dừng theo ADF)
+        giúp dự báo DLinear hay NLinear sẽ thắng?
+  \item[RQ2.] Độ nhạy theo độ dài cửa sổ (lookback \(L\)) khác nhau thế nào giữa hai mô hình,
+        và sự khác biệt đó có phụ thuộc vào bộ dữ liệu không?
+\end{description}
+
+WEEK03 cung cấp bảng MSE đầy đủ và đối chiếu với đặc trưng dữ liệu
+(Bảng~\ref{tab:profiles}) theo khung RQ; phần kiểm định chính thức
+(biểu đồ scatter, đường cong theo \(L\)) để lại cho WEEK04.
+
+\subsection{Mô hình}
+
+Ba mô hình tuyến tính được cài đặt từ đầu bằng PyTorch, chạy trên chuỗi đơn biến (univariate),
+dùng chung trọng số giữa các kênh (\texttt{individual=False})
+theo họ LTSF-Linear \cite{zeng2023ltsf}:
+
+\begin{description}
+  \item[Linear.] Ánh xạ trực tiếp cửa sổ lookback \(L\) sang tầm dự báo \(H\).
+  \item[NLinear.] Trừ giá trị cuối cửa sổ trước khi qua Linear, rồi cộng lại sau
+        --- giúp xử lý hiện tượng dịch mức (distribution shift).
+  \item[DLinear.] Phân rã bằng trung bình trượt (kernel \(m=25\)) thành xu hướng và thành phần còn lại,
+        mỗi thành phần qua một đầu Linear riêng, rồi cộng lại \cite{wu2021autoformer,zeng2023ltsf}.
+\end{description}
+
+\subsection{Dữ liệu, phân chia mẫu và thang đo}
+
+Sáu chuỗi đơn biến (cột OT hoặc \(\log(\mathrm{close})\) cho VIC) ---
+chính là sáu hàng trong Bảng~\ref{tab:profiles}, được chọn để bao phủ
+nhóm có mùa vụ rõ / chuỗi dừng và nhóm không có mùa vụ / không dừng (phục vụ RQ1).
+ETTh1/ETTh2 dùng cách chia của Informer; các bộ còn lại chia theo thời gian \(70/15/15\).
+\(\mathrm{StandardScaler}\) chỉ fit trên tập huấn luyện.
+Chỉ số chính: \textbf{test MSE trên không gian đã chuẩn hóa}.
+
+\subsection{Lưới độ dài cửa sổ, tầm dự báo và tốc độ học}
+
+\begin{itemize}
+  \item Các bộ LTSF: \(L,H \in \{96,192,336,720\}\) (lưới \(L\) phục vụ RQ2).
+  \item VIC: \(L \in \{5,30,120,480\}\), \(H=5\).
+  \item Tối ưu Adam với hàm mất mát MSE; khởi tạo Kaiming (He); seed \(2026\);
+        tối đa \(50\) epoch, dừng sớm (early stop) với patience \(10\).
+\end{itemize}
+
+\paragraph{Tốc độ học (learning rate) là gì?}
+Tốc độ học (ký hiệu \(\eta\)) là hệ số bước của bộ tối ưu Adam:
+mỗi bước cập nhật, trọng số thay đổi một lượng tỉ lệ với \(\eta\).
+Nếu \(\eta\) quá lớn, mô hình dễ phân kỳ hoặc không hội tụ;
+nếu quá nhỏ, mô hình có thể học chậm hoặc dừng sớm trước khi đạt nghiệm tốt.
+Tốc độ học \textbf{không} phải siêu tham số của mô hình dự báo
+(không phải \(L\) hay \(H\)); nó chỉ điều khiển quá trình huấn luyện.
+
+\paragraph{Cách chọn \(\eta\) trong báo cáo này.}
+Với mỗi ô \((\mathrm{model},\mathrm{dataset},L,H)\), chúng tôi chạy ba giá trị
+\(\eta \in \{0{,}005;\,0{,}001;\,0{,}0005\}\) rồi \textbf{giữ lần thử có test MSE nhỏ nhất}.
+Đây là cách chọn siêu tham số huấn luyện nội bộ (để so sánh mô hình công bằng hơn),
+\emph{không} phải ``tốc độ học tối ưu toàn cục'' hay tốc độ học của paper gốc.
+Mọi bảng MSE dưới đây đều dùng quy tắc này; gọi tắt là
+\emph{MSE sau khi chọn \(\eta\) trong lưới ba giá trị}.
+
+Tổng cộng \(756\) lần chạy \(\rightarrow\) \(252\) ô báo cáo
+(\(84\) cặp \((L,H)\) \(\times\) \(3\) mô hình), đầy đủ không thiếu ô nào.

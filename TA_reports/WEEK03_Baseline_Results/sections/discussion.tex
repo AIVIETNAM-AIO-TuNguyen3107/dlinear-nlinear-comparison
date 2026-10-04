@@ -1,0 +1,61 @@
+\section{Diễn giải theo RQ (chưa kết luận)}
+\label{sec:discussion}
+
+Phần này đọc lại Bảng~\ref{tab:meanmse}--\ref{tab:bestL} trong khung
+\textbf{RQ1} (đặc trưng dữ liệu \(\leftrightarrow\) mô hình thắng) và \textbf{RQ2} (độ dài cửa sổ).
+Mục tiêu WEEK03: nêu các xu hướng và đối chiếu với Bảng~\ref{tab:profiles};
+\textbf{chưa} kết luận H1 bằng biểu đồ scatter hay kiểm định thống kê.
+
+\subsection{RQ1 --- đối chiếu MSE với nhóm A / B / C}
+
+\begin{description}
+  \item[Nhóm A (mùa vụ rõ, chuỗi dừng) --- Weather, ETTh2, Electricity.]
+        Theo kỳ vọng H1, DLinear nên có lợi thế.
+        Thực tế: Weather \(16/16\) và ETTh2 \(14/16\) ô do NLinear thắng;
+        Electricity gần hòa, Linear thường tốt hơn một chút.
+        Đặc biệt Weather có \(F_S{=}0{,}876\) cao nhất mà NLinear vẫn vượt DLinear rõ
+        trên MSE đã chuẩn hóa --- đây là điểm \emph{mâu thuẫn} với H1, cần biểu đồ scatter
+        \(\Delta\) theo \(F_S\) ở WEEK04 để quyết định bác bỏ hoặc thu hẹp giả thuyết.
+
+  \item[Nhóm B (ETTh1) --- mùa vụ yếu, xu hướng mạnh.]
+        NLinear thắng \(16/16\) ô; khoảng cách thường lớn hơn ở \(H{=}720\).
+        Kết quả phù hợp với câu chuyện về dịch chuyển phân phối (distribution shift) trên ETT trong
+        paper \cite{zeng2023ltsf} hơn là với giả thuyết ``\(F_S\) cao \(\Rightarrow\) DLinear thắng''.
+
+  \item[Nhóm C (không có mùa vụ, không dừng) --- Exchange, VIC.]
+        Theo kỳ vọng H1, NLinear nên có lợi thế hoặc \(\lvert\Delta\rvert\) nhỏ.
+        VIC: NLinear \(\approx\) DLinear (khi duyệt qua \(L\): \(0{,}0060\) so với \(0{,}0062\)),
+        cả hai tốt hơn Linear --- gần với kỳ vọng ``khoảng cách nhỏ / NLinear không thua''.
+        Exchange: \textbf{ngược kỳ vọng} --- DLinear thắng \(14/16\) ô;
+        MSE của NLinear tăng vọt ở \(H \ge 336\) (đạt \(\approx 1{,}6\) tại \(H{=}720\)).
+        Cần phân tích thêm (phân bố lỗi theo tầm dự báo, thí nghiệm bổ sung) trước khi gán nguyên nhân
+        cho \(F_S{=}0\) hay kiểm định ADF; WEEK04 sẽ đưa \(\Delta\) của Exchange vào biểu đồ scatter RQ1
+        như điểm đối chứng quan trọng.
+\end{description}
+
+\begin{examplebox}{Tóm tắt theo RQ (WEEK03)}
+  \textbf{RQ1 (chưa kết luận):}
+  Xu hướng ban đầu \emph{không} khớp gọn với H1 --- nhóm A (mùa vụ rõ) chưa thấy DLinear thống trị;
+  nhóm C (không dừng) chỉ VIC gần kỳ vọng, Exchange đi ngược.
+  Cần biểu đồ scatter \(\Delta\) theo \(F_S\)/\(F_T\)/\(p_{\mathrm{ADF}}\) để kết luận.\\[0.35em]
+  \textbf{RQ2 (chưa kết luận):}
+  \(L\) tối ưu phụ thuộc vào bộ dữ liệu; chưa có đường cong MSE theo \(L\) đầy đủ.
+  Tầm dự báo dài làm rõ hơn khoảng cách giữa các mô hình trên ETT và Exchange ---
+  nên phân tích RQ1 theo từng \(H\) (hoặc trung bình có điều kiện), không chỉ một số gộp.
+\end{examplebox}
+
+\subsection{Công việc còn lại (WEEK04) để kết luận RQ}
+
+\begin{enumerate}
+  \item \textbf{RQ1:} tính \(\Delta\) từng ô, vẽ biểu đồ scatter / heatmap theo \(F_S\), \(F_T\),
+        \(p_{\mathrm{ADF}}\); quyết định ủng hộ / bác bỏ / thu hẹp H1.
+  \item \textbf{RQ2:} vẽ đường cong MSE theo \(L\) cho NLinear và DLinear
+        trên từng bộ dữ liệu (nhóm A/B/C).
+  \item Thí nghiệm thay đổi kernel MA của DLinear (ablation); viết hướng dẫn một đoạn cho người dùng.
+\end{enumerate}
+
+\vspace{0.5em}
+\noindent\textit{File liên quan:}
+\code{Working_Files/results/grid_results.csv},
+\code{Working_Files/TA_reports/WEEK02_Data_Profiles.csv},
+\code{Working_Files/TA_reports/WEEK03_Baseline_Protocol.md}.

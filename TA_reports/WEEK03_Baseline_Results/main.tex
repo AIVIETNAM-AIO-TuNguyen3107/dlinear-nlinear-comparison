@@ -1,0 +1,217 @@
+\documentclass[12pt]{article}
+
+\usepackage{hyphenat}
+\usepackage[utf8]{vietnam}
+\usepackage[vietnamese=nohyphenation]{hyphsubst}
+\usepackage[vietnamese]{babel}
+\usepackage[table,dvipsnames]{xcolor}
+\usepackage{booktabs}
+\usepackage{ragged2e}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage[inline,shortlabels]{enumitem}
+\usepackage{setspace}
+\usepackage{bm}
+\usepackage{titling}
+\usepackage{tabularx}
+\usepackage[T5,T1]{fontenc}
+\usepackage{lmodern,mathrsfs}
+\usepackage{hyperref}
+\usepackage{fontawesome5}
+\usepackage[most]{tcolorbox}
+\usepackage[autostyle=false,style=english]{csquotes}
+\usepackage[
+  backend=biber,
+  style=ieee,
+  citestyle=numeric-comp,
+  maxnames=1,
+  minnames=1,
+  uniquelist=false,
+  hyperref=false
+]{biblatex}
+\addbibresource{references.bib}
+\DefineBibliographyStrings{english}{
+  andothers = {et\addabbrvspace al\adddot}
+}
+\DeclareLanguageMapping{vietnamese}{english}
+\AtBeginDocument{\renewcommand\refname{}}
+
+\usepackage{xurl}
+\setlength{\headheight}{14.5pt}
+\setlength{\topmargin}{-.5in} \setlength{\textheight}{9.25in}
+\setlength{\oddsidemargin}{-0.1in} \setlength{\textwidth}{6.8in}
+
+\usepackage{framed}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{epigraph}
+
+\definecolor{aivnGreen}{RGB}{52,79,30}
+\definecolor{brandIndigo}{HTML}{333D91}
+\definecolor{captionbg}{RGB}{250,250,250}
+\setlength{\parskip}{0.3em}
+
+\newtcolorbox{infobox}[1]{%
+    enhanced,
+    breakable,
+    colback=green!3,
+    colframe=green!3,
+    arc=5pt,
+    borderline west={3pt}{0pt}{aivnGreen},
+    attach boxed title to top left={
+        yshift*=-\tcboxedtitleheight/2,
+        xshift=-0.1em
+    },
+    colbacktitle=aivnGreen,
+    coltitle=white,
+    fonttitle=\bfseries,
+    boxed title style={
+        arc=4pt, top=2pt, bottom=2pt, left=8pt, right=8pt,
+    },
+    title={\faInfoCircle\quad #1}
+}
+
+\newtcolorbox{examplebox}[1]{%
+    enhanced,
+    breakable,
+    colback=brandIndigo!5,
+    colframe=brandIndigo!5,
+    arc=5pt,
+    borderline west={3pt}{0pt}{brandIndigo},
+    attach boxed title to top left={
+        yshift*=-\tcboxedtitleheight/2,
+        xshift=-0.1em
+    },
+    colbacktitle=brandIndigo,
+    coltitle=white,
+    fonttitle=\bfseries,
+    boxed title style={
+        arc=4pt, top=2pt, bottom=2pt, left=8pt, right=8pt,
+    },
+    title={\faLightbulb\quad #1}
+}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=magenta,
+    citecolor=aivnGreen,
+    urlcolor=blue,
+    pdftitle={WEEK03 Baseline Results: DLinear vs NLinear},
+}
+
+\renewcommand{\thesection}{\Roman{section}.}
+\renewcommand{\thesubsection}{\thesection\arabic{subsection}.}
+\renewcommand{\thesubsubsection}{\thesubsection\arabic{subsubsection}.}
+
+\titleformat{\section}
+  {\normalfont\fontsize{16pt}{20pt}\selectfont\bfseries}
+  {\thesection}{0.85em}{}
+\titleformat{\subsection}
+  {\normalfont\fontsize{14pt}{16pt}\selectfont\bfseries}
+  {\thesubsection}{0.75em}{}
+\titleformat{\subsubsection}
+  {\normalfont\fontsize{12pt}{15pt}\selectfont\bfseries}
+  {\thesubsubsection}{0.65em}{}
+
+\titlespacing*{\section}{0pt}{1.25em plus 0.2em minus 0.1em}{0.65em plus 0.1em minus 0.1em}
+\titlespacing*{\subsection}{0pt}{1.0em plus 0.2em minus 0.1em}{0.45em plus 0.1em minus 0.1em}
+\titlespacing*{\subsubsection}{0pt}{0.85em plus 0.15em minus 0.1em}{0.35em plus 0.1em minus 0.1em}
+
+\setlength{\droptitle}{-7em}
+\newcommand{\TitleRule}{\rule{0.90\textwidth}{0.6pt}}
+\newlength{\TitleBlockHeight}
+\setlength{\TitleBlockHeight}{2.6cm}
+
+\pretitle{%
+  \begin{tabular}{@{}c@{}}
+    \raisebox{-0.35\height}{\includegraphics[height=2.0cm]{Figures/aio2026_logo.pdf}}
+  \end{tabular}
+  \begin{center}
+  \TitleRule
+  \par\nointerlineskip
+}
+\title{%
+  \parbox[c][\TitleBlockHeight][c]{0.90\textwidth}{%
+    \centering
+    {\fontsize{18pt}{22pt}\selectfont\bfseries
+      Khi nào Decomposition vượt qua Normalization?}\\[0.35em]
+    {\fontsize{13pt}{16pt}\selectfont
+      WEEK03: Baseline Results --- Interpret Overall}
+  }%
+}
+\posttitle{%
+  \par\nointerlineskip
+  \TitleRule
+  \end{center}
+}
+\preauthor{\begin{center}\fontsize{11pt}{13pt}\selectfont}
+\author{%
+  \textbf{Topic Team AIO2026: DLinear \& NLinear}\\[0.4em]
+  {\small Subtopic: So sánh DLinear \& NLinear trong bài toán Forecasting}
+}
+\postauthor{\par\end{center}}
+\date{}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\href{https://www.facebook.com/aivietnam.edu.vn}{\textcolor{aivnGreen}{\bfseries AI VIET NAM (AIO2026)}}}
+\rhead{\href{https://aivietnam.edu.vn/}{\textcolor{aivnGreen}{\bfseries aivietnam.edu.vn}}}
+\fancyfoot[r]{\textcolor{aivnGreen}{\bfseries Trang \thepage}}
+\fancyfoot[l]{%
+  \href{https://zalo.me/84911118758}{%
+    \textcolor{aivnGreen}{\bfseries SĐT/Zalo: 0911118758 (Dr. Hồng Phúc)}%
+  }%
+}
+\renewcommand{\headrulewidth}{1.0pt}
+\renewcommand{\headrule}{{\color{aivnGreen}\hrule width\headwidth height\headrulewidth \vskip-\headrulewidth}}
+\renewcommand{\footrulewidth}{1.0pt}
+\renewcommand{\footrule}{{\color{aivnGreen}\hrule width\headwidth height\headrulewidth \vskip-\headrulewidth}}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[r]{\textcolor{aivnGreen}{\bfseries Trang \thepage}}
+    \fancyfoot[l]{%
+      \href{https://zalo.me/84911118758}{%
+        \textcolor{aivnGreen}{\bfseries SĐT/Zalo: 0911118758 (Dr. Hồng Phúc)}%
+      }%
+    }
+    \renewcommand{\headrulewidth}{0pt}
+    \renewcommand{\footrulewidth}{1.0pt}
+    \renewcommand{\footrule}{%
+        {\color{aivnGreen}\hrule width\headwidth height\footrulewidth}
+    }
+}
+
+\DeclareUrlCommand\code{\urlstyle{tt}}
+\setlength{\emergencystretch}{3em}
+\setlist[itemize]{leftmargin=1.4em, itemsep=0.25em, topsep=0.35em}
+\setlist[description]{style=nextline, leftmargin=2.2em}
+\setlist[enumerate]{leftmargin=1.4em, itemsep=0.25em, topsep=0.35em}
+
+\begin{document}
+\maketitle
+\thispagestyle{firstpage}
+\vspace{-2em}
+
+\begin{infobox}{Trạng thái tài liệu}
+  WEEK03 báo cáo \textbf{kết quả baseline trên nhiều bộ dữ liệu} (Linear / NLinear / DLinear)
+  gắn với \textbf{RQ1} (đặc trưng dữ liệu \(\leftrightarrow\) mô hình nào thắng)
+  và \textbf{RQ2} (độ nhạy theo độ dài cửa sổ), nhưng \textbf{chưa kết luận} hai RQ
+  (thiếu biểu đồ scatter \(\Delta\) theo \(F_S\)/\(F_T\) và đường cong theo \(L\) --- WEEK04).
+  Số liệu: \code{results/grid_results.csv};
+  quy trình: \code{TA_reports/WEEK03_Baseline_Protocol.md}.
+\end{infobox}
+
+\input{sections/setup}
+\input{sections/profiles}
+\input{sections/results}
+\input{sections/discussion}
+
+\section*{Tài liệu tham khảo}
+\addcontentsline{toc}{section}{Tài liệu tham khảo}
+\printbibliography[heading=none]
+
+\end{document}
