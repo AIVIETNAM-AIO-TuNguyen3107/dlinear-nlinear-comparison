@@ -39,6 +39,9 @@ Thumbs.db
 data/*.csv
 data/.cache/
 
+# Training checkpoints
+checkpoints/
+
 # Test artifacts
 test_src/__pycache__/
 test_src/*.pyc
