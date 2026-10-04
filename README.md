@@ -4,7 +4,7 @@
 
 Research project comparing **DLinear** (decomposition) and **NLinear** (normalization) on long-term time series forecasting (LTSF). We relate which model wins to **data characteristics** (STL trend / seasonal strength, non-stationarity), not only MSE on a single dataset.
 
-Part of AIO Module 4 (AIVIETNAM). Research outline: [`WEEK01_Outline.md`](WEEK01_Outline.md).
+Part of AIO Module 4 (AIVIETNAM). Research outline: [`TA_reports/WEEK01_Outline.md`](TA_reports/WEEK01_Outline.md).
 
 ## Research questions
 
@@ -30,96 +30,65 @@ Part of AIO Module 4 (AIVIETNAM). Research outline: [`WEEK01_Outline.md`](WEEK01
 ```
 Working_Files/
 ├── data/                 # CSVs (gitignored; download script fills this)
+├── checkpoints/          # best.pt / last.pt / config.json (gitignored)
+├── figures/preds/        # real vs pred plots
+├── results/              # grid / refine CSVs
+├── TA_reports/           # weekly TA writeups (outline, notes, LaTeX, protocol)
 ├── src/
 │   ├── config.py             # paths, dataset specs, download targets
-│   ├── pipeline/
-│   │   ├── models.py         # Linear, NLinear, DLinear
-│   │   ├── dataset.py        # (W3) forecast window loaders
-│   │   └── eval.py           # (W4) metrics / ablation helpers
+│   ├── pipeline/             # models, dataset, train, eval
 │   ├── utils/
-│   │   └── logger.py         # structlog setup
-│   └── scripts/
-│       ├── data_chars.py     # STL strengths (F_T, F_S), ADF; load_series
-│       └── download_data.py  # HF + Yahoo Finance CSVs
-├── test_src/             # pytest
-├── notebooks/ / WEEK0*   # weekly notes & experiments
+│   └── scripts/              # CLIs — see src/scripts/README.md
+├── test_src/
 ├── pyproject.toml
 └── uv.lock
 ```
 
-## Requirements
-
-- Python **≥ 3.10**
-- [uv](https://docs.astral.sh/uv/) (recommended)
-- Network once to download datasets (Hugging Face + Yahoo Finance)
-
 ## Setup
 
-From `Working_Files/`:
+Requirements: Python **≥ 3.10**, [uv](https://docs.astral.sh/uv/) recommended. Network once for datasets (Hugging Face + Yahoo Finance).
 
 ```bash
-# create/sync .venv from pyproject.toml + lockfile
 uv sync --extra dev
-
-# optional: activate (uv run … works without this)
-source .venv/bin/activate
+# optional: source .venv/bin/activate
+uv pip list   # uv venvs often have no pip
 ```
 
-**List project packages** (uv venvs often have no `pip`):
+## How to run
 
-```bash
-uv pip list
-```
+**All script usage** (download, data-chars, train, grid, plots): [`src/scripts/README.md`](src/scripts/README.md).
 
-## Download data
-
-Idempotent: skips files that already exist and are non-empty.
+Baseline protocol (splits, scaling, grids): [`TA_reports/WEEK03_Baseline_Protocol.md`](TA_reports/WEEK03_Baseline_Protocol.md).
 
 ```bash
 uv run python src/scripts/download_data.py
+uv run python src/scripts/run_grid.py --mode ett --epochs 50 --patience 10
+uv run python src/scripts/plot_preds.py
 ```
 
-- LTSF CSVs ← Hugging Face [`thuml/Time-Series-Library`](https://huggingface.co/datasets/thuml/Time-Series-Library)
-- `VIC.csv` ← `yfinance` ticker `VIC.VN` (`period="max"`)
-- Cache under `data/.cache/`
+## Models
 
-Second run should print `skip:…` for every file.
-
-## Run data-character profiling
-
-After data is present:
-
-```bash
-uv run python src/scripts/data_chars.py
-```
-
-Writes / updates profile metrics (see module docstring; expects CSVs in `data/`).
-
-## Tests
-
-```bash
-uv run --extra dev pytest
-# or, if pytest is already installed in .venv:
-uv run pytest
-```
-
-## Models (scratch)
-
-Implemented in `src/pipeline/models.py` (channel-independent, shared weights):
+In `src/pipeline/models.py` (channel-independent, shared weights):
 
 - **Linear** — one linear map lookback → horizon
 - **NLinear** — subtract last value, linear, add back
 - **DLinear** — moving-average decomp + dual linear heads
 
-Scratch notebook: `WEEK02_Scratch_Models.ipynb`.
+Scratch notebook: [`TA_reports/WEEK02_Scratch_Models.ipynb`](TA_reports/WEEK02_Scratch_Models.ipynb).
+
+## Tests
+
+```bash
+uv run --extra dev pytest
+```
 
 ## Status (by week)
 
 | Week | Focus | Status |
 | ---- | ----- | ------ |
 | W1 | Outline, reading notes, papers | Done |
-| W2 | Gap note, models, data-char | In progress |
-| W3 | Multi-dataset baseline | Planned |
+| W2 | Gap note, models, data-char | Done |
+| W3 | Multi-dataset baseline + train loop | In progress |
 | W4 | Ablation + guideline | Planned |
 
 ## Citation / references
