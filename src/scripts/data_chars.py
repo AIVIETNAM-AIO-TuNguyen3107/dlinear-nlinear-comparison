@@ -2,7 +2,7 @@
 
 Descriptive profiling may use the full series.
 Place CSVs under Working_Files/data/ (see DATASET_SPECS); re-run to dump
-WEEK02_Data_Profiles.csv.
+TA_reports/WEEK02_Data_Profiles.csv.
 """
 
 from __future__ import annotations

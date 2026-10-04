@@ -55,7 +55,7 @@ class Config(BaseSettings):
     root_dir: Path = Path(__file__).resolve().parents[1]
     data_dir: Path = root_dir / "data"
     cache_dir: Path = data_dir / ".cache"
-    profiles_csv: Path = root_dir / "WEEK02_Data_Profiles.csv"
+    profiles_csv: Path = root_dir / "TA_reports" / "WEEK02_Data_Profiles.csv"
     HF_BASE: str = (
         "https://huggingface.co/datasets/thuml/Time-Series-Library/resolve/main"
     )

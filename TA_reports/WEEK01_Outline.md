@@ -69,16 +69,16 @@ DLinear_NLinear/
 │   ├── Paper Tracker - ….xlsx   ← sheet ≥5 papers
 │   └── papers/                  ← PDF local (tham chiếu)
 └── Working_Files/
-    ├── WEEK01_Outline.md        ← this file (vấn đề + kế hoạch)
-    ├── WEEK01_Reading_Note/     ← Cornell / cơ chế (main.pdf)
-    ├── WEEK02 - Research Gap Analysis/  ← living LaTeX paper (intro/problem/hypothesis → +results later)
-    ├── WEEK02_* / WEEK03_* / WEEK04_*
+    ├── TA_reports/              ← weekly TA writeups
+    │   ├── WEEK01_Outline.md    ← this file (vấn đề + kế hoạch)
+    │   ├── WEEK01_Reading_Note/ ← Cornell / cơ chế (main.pdf)
+    │   ├── WEEK02_Research_Gap_Analysis/  ← living LaTeX paper
+    │   ├── WEEK02_* / WEEK03_* / WEEK04_*
+    │   └── WEEK02_Data_Profiles.csv
     ├── Research_Notebook.md
     └── src/
-        ├── models.py
-        ├── data_chars.py        ← STL / strength metrics
-        ├── dataset.py
-        └── eval.py
+        ├── pipeline/            ← models, dataset, train, …
+        └── scripts/             ← CLIs (data_chars, train, run_grid, …)
 ```
 
 **Phân vai file:** Outline = *làm gì / vì sao*; Reading Note = *hiểu cơ chế*; Tracker xlsx = *từng paper*; `WEEK02 - Research Gap Analysis/` = *living paper gửi TA (gap slice → full results)*; `EXECUTION_PLAN.md` = *làm từng bước thế nào*.
