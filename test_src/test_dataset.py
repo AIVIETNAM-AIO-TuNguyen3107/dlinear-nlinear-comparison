@@ -7,8 +7,8 @@ from sklearn.preprocessing import StandardScaler
 
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 
+from src.config import VIC_PRED_LEN
 from src.pipeline.dataset import (
-    VIC_PRED_LEN,
     ForecastWindowDataset,
     Split,
     border_pairs,

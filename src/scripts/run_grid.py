@@ -12,9 +12,10 @@ import json
 import shutil
 from pathlib import Path
 
-from src.pipeline.dataset import (
+from src.config import (
     LTSF_HORIZONS,
     LTSF_LOOKBACKS,
+    TRAIN_PROTOCOL,
     VIC_LOOKBACKS,
     VIC_PRED_LEN,
 )
@@ -23,7 +24,6 @@ from src.utils import logger
 
 MODELS = ("Linear", "NLinear", "DLinear")
 LTSF_DATASETS = ("ETTh1", "ETTh2", "Weather", "Exchange-Rate", "Electricity")
-DEFAULT_LRS = (5e-3, 1e-3, 5e-4)
 
 
 def _jobs(mode: str) -> list[tuple[str, str, int, int]]:
@@ -97,11 +97,11 @@ def main(argv: list[str] | None = None) -> int:
         default="ltsf",
         help="ett/paper=ETTh* L∈{96,336}; ltsf=full LTSF; vic; all=ltsf+vic",
     )
-    p.add_argument("--epochs", type=int, default=50)
-    p.add_argument("--patience", type=int, default=10)
+    p.add_argument("--epochs", type=int, default=TRAIN_PROTOCOL["epochs"])
+    p.add_argument("--patience", type=int, default=TRAIN_PROTOCOL["patience"])
     p.add_argument(
         "--lrs",
-        default=",".join(str(x) for x in DEFAULT_LRS),
+        default=",".join(str(x) for x in TRAIN_PROTOCOL["lrs"]),
         help="comma-separated learning-rate grid (default: 0.005,0.001,0.0005)",
     )
     p.add_argument(
@@ -110,8 +110,8 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         help="single learning rate (overrides --lrs)",
     )
-    p.add_argument("--batch-size", type=int, default=32)
-    p.add_argument("--seed", type=int, default=2026)
+    p.add_argument("--batch-size", type=int, default=TRAIN_PROTOCOL["batch_size"])
+    p.add_argument("--seed", type=int, default=TRAIN_PROTOCOL["seed"])
     p.add_argument("--device", default="auto")
     p.add_argument("--ckpt-dir", type=Path, default=Path("checkpoints"))
     p.add_argument("--results", type=Path, default=Path("results/grid_results.csv"))

@@ -6,7 +6,7 @@
 - `src.pipeline.dataset.make_dataloaders(name, seq_len, pred_len, batch_size=32, ...)`
 - `src.pipeline.train.run_training(...)` — one run; He init, Adam, early stop, checkpoints
 - Grid CLI: `src/scripts/run_grid.py` (lookback × lr); plots: `src/scripts/plot_preds.py`
-- Grid constants: `LTSF_LOOKBACKS`, `LTSF_HORIZONS`, `VIC_LOOKBACKS`, `VIC_PRED_LEN`
+- Protocol constants: `TRAIN_PROTOCOL`, `LTSF_LOOKBACKS`, `LTSF_HORIZONS`, `VIC_LOOKBACKS`, `VIC_PRED_LEN` in `src.config`
 
 `split` is `Split.TRAIN` / `Split.VAL` / `Split.TEST`. Specs (file, column, log) come from `settings.get_spec` in `src.config`.
 

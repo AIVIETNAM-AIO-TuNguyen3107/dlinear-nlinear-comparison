@@ -3,6 +3,20 @@ from typing import Any
 
 from pydantic_settings import BaseSettings
 
+# Baseline protocol defaults (see TA_reports/WEEK03_Baseline_Protocol.md)
+TRAIN_PROTOCOL = {
+    "epochs": 50,
+    "patience": 10,
+    "batch_size": 32,
+    "seed": 2026,
+    "lrs": (5e-3, 1e-3, 5e-4),
+}
+
+LTSF_LOOKBACKS = (96, 192, 336, 720)
+LTSF_HORIZONS = (96, 192, 336, 720)
+VIC_LOOKBACKS = (5, 30, 120, 480)
+VIC_PRED_LEN = 5
+
 
 class Config(BaseSettings):
     # period: ETTh hourly → 24; daily series → 7 (document in notes; use 365 only if long enough)
@@ -56,6 +70,8 @@ class Config(BaseSettings):
     data_dir: Path = root_dir / "data"
     cache_dir: Path = data_dir / ".cache"
     profiles_csv: Path = root_dir / "TA_reports" / "WEEK02_Data_Profiles.csv"
+    grid_result_csv: Path = root_dir / "results" / "grid_results.csv"
+    baseline_results_csv: Path = root_dir / "TA_reports" / "WEEK03_Results.csv"
     HF_BASE: str = (
         "https://huggingface.co/datasets/thuml/Time-Series-Library/resolve/main"
     )

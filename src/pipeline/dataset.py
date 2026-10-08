@@ -9,12 +9,6 @@ from torch.utils.data import DataLoader, Dataset
 from src.config import settings
 from src.utils import load_series
 
-# Protocol default grids (see TA_reports/WEEK03_Baseline_Protocol.md)
-LTSF_LOOKBACKS = (96, 192, 336, 720)
-LTSF_HORIZONS = (96, 192, 336, 720)
-VIC_LOOKBACKS = (5, 30, 120, 480)
-VIC_PRED_LEN = 5
-
 
 class Split(Enum):
     TRAIN = "train"

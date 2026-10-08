@@ -114,8 +114,7 @@ Failed trials are logged and written with empty metrics + `error`; the loop cont
 ### Modes (`--mode`)
 
 Constants from `src/pipeline/dataset.py`:  
-`LTSF_LOOKBACKS = LTSF_HORIZONS = (96, 192, 336, 720)`,  
-`VIC_LOOKBACKS = (5, 30, 120, 480)`, `VIC_PRED_LEN = 5`.  
+`LTSF_LOOKBACKS` / `LTSF_HORIZONS` / `VIC_*` and `TRAIN_PROTOCOL` live in `src.config`.  
 Models always: `Linear`, `NLinear`, `DLinear`.
 
 | Mode | Cells (before × lr) | What expands |
